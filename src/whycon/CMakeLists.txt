@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
+set(OpenCV_DIR /usr/local/share/OpenCV)
 project(whycon)
 
 # set some flags
@@ -51,7 +52,7 @@ if(NOT DISABLE_ROS)
 endif()
 
 ### SYSTEM DEPENDENCIES ###
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 3.4 REQUIRED)
 message(STATUS "Using OpenCV version ${OpenCV_VERSION}")
 find_package(Boost COMPONENTS program_options thread system REQUIRED)
 
@@ -60,11 +61,18 @@ pkg_check_modules(YAML_CPP yaml-cpp)
 
 ### TARGETS ###
 include_directories(
-  ${catkin_INCLUDE_DIRS} ${YAML_CPP_INCLUDE_DIRS} include
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${YAML_CPP_INCLUDE_DIRS} 
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 add_library(whycon SHARED src/lib/circle_detector.cpp src/lib/many_circle_detector.cpp src/lib/localization_system.cpp)
-target_link_libraries(whycon ${OpenCV_LIBS} ${Boost_LIBRARIES})
+target_link_libraries(
+  whycon 
+  ${OpenCV_LIBS}
+  ${Boost_LIBRARIES}
+)
 
 if(NOT DISABLE_ROS)
   add_executable(whycon-node src/ros/whycon_node.cpp src/ros/whycon_ros.cpp)

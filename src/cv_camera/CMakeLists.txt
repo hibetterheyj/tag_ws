@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 2.8.3)
+set(OpenCV_DIR /usr/local/share/OpenCV)
 project(cv_camera)
 
 find_package(catkin REQUIRED COMPONENTS
   image_transport roscpp cv_bridge sensor_msgs nodelet camera_info_manager roslint)
 
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 3.4 REQUIRED)
 
 find_package(Boost REQUIRED COMPONENTS system thread)
 
@@ -21,6 +22,7 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
   )
 
 ## Declare a cpp library
