@@ -1,0 +1,10 @@
+<launch>
+  <!--REFERENCE-->
+  <!-- https://wiki.ros.org/cv_camera -->
+  <!-- ARGS-->
+  <arg name="device_id" default="0" />
+
+  <node name="cv_camera" pkg="cv_camera" type="cv_camera_node" output="screen" >
+    <param name="device_id" value="$(arg device_id)" />
+  </node>
+</launch>
