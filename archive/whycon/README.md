@@ -1,3 +1,12 @@
+- 20.04 or OpenCV4
+
+```
+CV_FONT_HERSHEY_SIMPLEX -> cv::FONT_HERSHEY_SIMPLEX
+CV_AA -> cv::LINE_AA
+CV_RETR_EXTERNAL -> cv::RETR_EXTERNAL
+CV_LMEDS -> cv::LMEDS
+```
+
 # WhyCon
 ## A precise, efficient and low-cost localization system
 

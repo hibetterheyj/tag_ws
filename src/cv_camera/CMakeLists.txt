@@ -5,7 +5,8 @@ project(cv_camera)
 find_package(catkin REQUIRED COMPONENTS
   image_transport roscpp cv_bridge sensor_msgs nodelet camera_info_manager roslint)
 
-find_package(OpenCV 3.4 REQUIRED)
+#find_package(OpenCV 3.4 REQUIRED)
+find_package(OpenCV 3 REQUIRED)
 
 find_package(Boost REQUIRED COMPONENTS system thread)
 

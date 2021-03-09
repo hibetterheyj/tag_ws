@@ -110,7 +110,9 @@ void whycon::WhyConROS::publish_results(const std_msgs::Header& header, const cv
       circle.draw(output_image, ostr.str(), cv::Vec3b(0,255,255));
 			/*whycon::CircleDetector::Circle new_circle = circle.improveEllipse(cv_ptr->image);
 			new_circle.draw(output_image, ostr.str(), cv::Vec3b(0,255,0));*/
-			cv::circle(output_image, camera_model.project3dToPixel(cv::Point3d(coord)), 1, cv::Scalar(255,0,255), 1, CV_AA);
+			// cv::circle(output_image, camera_model.project3dToPixel(cv::Point3d(coord)), 1, cv::Scalar(255,0,255), 1, CV_AA);
+      // 20.04
+      cv::circle(output_image, camera_model.project3dToPixel(cv::Point3d(coord)), 1, cv::Scalar(255,0,255), 1, cv::LINE_AA);
     }
 
     if (publish_poses) {

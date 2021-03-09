@@ -15,13 +15,34 @@
        guvcview --device=/dev/video1
        ```
 
-       
-
     2. Run guvcview and adjust your camera settings (exposure, brightness etc).
 
 ---
 
 ## ROS package
+
+### cv_camera
+
+- rostopic published by cv_camera
+  ```
+  /cv_camera/camera_info
+  /cv_camera/image_raw
+  /cv_camera/image_raw/compressed
+  /cv_camera/image_raw/compressed/parameter_descriptions
+  /cv_camera/image_raw/compressed/parameter_updates
+  /cv_camera/image_raw/compressedDepth
+  /cv_camera/image_raw/compressedDepth/parameter_descriptions
+  /cv_camera/image_raw/compressedDepth/parameter_updates
+  /cv_camera/image_raw/theora
+  /cv_camera/image_raw/theora/parameter_descriptions
+  /cv_camera/image_raw/theora/parameter_updates
+  /rosout
+  /rosout_agg
+  ```
+
+```shell
+roslaunch cv_camera cv_camera_test.launch
+```
 
 ### vision_opencv
 
@@ -31,10 +52,17 @@ git checkout melodic
 ```
 then change the `CMakeLists.txt` by setting specfic version, such as `find_package(OpenCV 3.4 REQUIRED`
 
-### whycon-orig
-    https://github.com/gestom/whycon-orig/tree/opencv
-    ```
-    cd src/
-    make CXX=clang
-    # Error
-    ```
+### whycon
+- code: https://github.com/lrse/whycon
+- wiki: https://github.com/lrse/whycon/wiki
+  - [Reference: A description of the ROS nodes can be found here](https://github.com/lrse/whycon/wiki/Reference)
+  - [Usage Tutorial: See a step-by-step tutorial here.](https://github.com/lrse/whycon/wiki/Tutorial)
+
+### whycon-orig (deprecated)
+- code: https://github.com/gestom/whycon-orig/tree/opencv
+
+```
+cd src/
+make CXX=clang
+# Error
+```

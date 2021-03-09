@@ -91,7 +91,9 @@ tf::Matrix3x3 whycon::AxisSetter::compute_projection(const std::vector<tf::Point
   for (int i = 0; i < 4; i++) src[i] = cv::Vec2d(points[i].getX(), points[i].getY()) / points[i].getZ();
 	std::vector<cv::Vec2d> dest = { cv::Vec2d(0,0), cv::Vec2d(xscale, 0), cv::Vec2d(0, yscale), cv::Vec2d(xscale, yscale) };
 
-	cv::Matx33d projection = cv::findHomography(src, dest, CV_LMEDS);
+	// cv::Matx33d projection = cv::findHomography(src, dest, CV_LMEDS);
+	// 20.04
+	cv::Matx33d projection = cv::findHomography(src, dest, cv::LMEDS);
 
 	tf::Matrix3x3 m;
 	for (int i = 0; i < 3; i++)
