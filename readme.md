@@ -28,6 +28,25 @@
 
 ### cv_camera
 
+- launch files
+  - calibrate
+
+    ```shell
+    roslaunch cv_camera cv_camera_only.launch
+    # START A NEW TEMINNAL
+    rosrun camera_calibration cameracalibrator.py --size 9x7 --square 0.020 image:=/cv_camera/image_raw camera:=/cv_camera
+    ```
+
+  - view only
+
+    ```shell
+    roslaunch cv_camera cv_camera_view.launch
+    roslaunch cv_camera cv_camera_view.launch device_id:=1
+    ```
+
+- parameters
+  - `~camera_info_url (string)` – url of camera info yaml.
+
 - rostopic published by cv_camera
   ```
   /cv_camera/camera_info
@@ -45,10 +64,9 @@
   /rosout_agg
   ```
 
-```shell
-roslaunch cv_camera cv_camera_test.launch
-roslaunch cv_camera cv_camera_test.launch device_id:=1
-```
+### image_proc
+- http://wiki.ros.org/image_proc
+- https://answers.ros.org/question/208724/how-to-run-image_proc-with-roslaunch/
 
 ### vision_opencv
 
@@ -72,3 +90,11 @@ cd src/
 make CXX=clang
 # Error
 ```
+
+## Misc.
+
+⭐ add delay time in launch files
+```xml
+<arg name="node_start_delay" default="1.0" />  
+<node name="listener" pkg="roscpp_tutorials" type="listener" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' " />
+``

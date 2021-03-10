@@ -1,0 +1,31 @@
+<launch>
+  <!-- COMMENT -->
+  <!-- 
+    This file is deprecated! It will get the following warning:
+    [ WARN] [1615385690.863585269]: The input topic '/cv_camera/image_raw' is not yet advertised
+    [ WARN] [1615385690.864211771]: The input topic '/cv_camera/camera_info' is not yet advertised
+  -->
+  <!-- ARGS-->
+  <arg name="device_id" default="0" />
+  <arg name="calib_file_path" default="$(find cv_camera)/config/trust_webcam/camera.yaml" />
+
+  <!-- NODE-->
+  <node name="cv_camera" pkg="cv_camera" type="cv_camera_node" output="screen" >
+    <param name="device_id" value="$(arg device_id)" />
+    <param name="camera_info_url" value="$(arg calib_file_path)" />
+  </node>
+
+  <!-- image_raw -->
+  <node name="image_view_raw" pkg="image_view" type="image_view" respawn="false" output="screen">
+    <remap from="image" to="/cv_camera/image_raw" />
+    <param name="autosize" value="true" />
+  </node>
+
+  <!-- image_rect_color -->
+  <node name="image_proc" pkg="image_proc" type="image_proc" ns="cv_camera" />
+
+  <node name="image_view_rect" pkg="image_view" type="image_view" respawn="false" output="screen">
+    <remap from="image" to="/cv_camera/image_rect_color" />
+    <param name="autosize" value="true" />
+  </node>
+</launch>
