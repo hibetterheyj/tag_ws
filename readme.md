@@ -2,12 +2,17 @@
 
 ## Work with camera
 
+### shell
+
 - list cameras and its permissions
   
   - `ll /dev/video*`
 - cannot access camare
   
   - `chmod 777 /dev/video1`
+
+### guvcview
+
 - sudo apt install guvcview
     1. Check the available resolutions, framerates and formats of your USB camera by running
 
@@ -42,6 +47,7 @@
 
 ```shell
 roslaunch cv_camera cv_camera_test.launch
+roslaunch cv_camera cv_camera_test.launch device_id:=1
 ```
 
 ### vision_opencv

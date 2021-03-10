@@ -4,6 +4,10 @@
   <!-- ARGS-->
   <arg name="device_id" default="0" />
 
+  <!--
+    roslaunch cv_camera cv_camera_test.launch device_id:=1
+  to change between different camera!
+  -->
   <node name="cv_camera" pkg="cv_camera" type="cv_camera_node" output="screen" >
     <param name="device_id" value="$(arg device_id)" />
   </node>
