@@ -116,6 +116,9 @@ then change the `CMakeLists.txt` by setting specfic version, such as `find_packa
   - don't worry when you get warning!!!
   - some function get changed in OpenCV4, such as `CV_AA` to `cv.LINE_AA`
 
+### aruco_ros
+- https://github.com/pal-robotics/aruco_ros
+
 ### whycon-orig (deprecated)
 - code: https://github.com/gestom/whycon-orig/tree/opencv
 
@@ -135,8 +138,9 @@ make CXX=clang
 
 ## Misc.
 
-⭐ add delay time in launch files
-```xml
-<arg name="node_start_delay" default="1.0" />  
-<node name="listener" pkg="roscpp_tutorials" type="listener" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' " />
-``
+- apriltag only works when using `catkin build` https://github.com/AprilRobotics/apriltag_ros
+- ⭐ add delay time in launch files
+  ```xml
+  <arg name="node_start_delay" default="1.0" />  
+  <node name="listener" pkg="roscpp_tutorials" type="listener" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' " />
+  ```
