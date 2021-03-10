@@ -6,10 +6,10 @@
     <node pkg="image_proc" type="image_proc" name="image_proc"/>
   </group>
 
-  <node name="image_rect" pkg="image_view" type="image_view" respawn="false" output="screen">
+  <!-- <node name="image_rect" pkg="image_view" type="image_view" respawn="false" output="screen">
     <remap from="image" to="/cv_camera/image_rect_color" />
     <param name="autosize" value="true" />
-  </node>
+  </node> -->
 
   <node name="whycon" type="whycon" pkg="whycon" output="screen">
     <param name="targets" value="$(arg targets)"/>

@@ -96,13 +96,25 @@ then change the `CMakeLists.txt` by setting specfic version, such as `find_packa
   - [Reference: A description of the ROS nodes can be found here](https://github.com/lrse/whycon/wiki/Reference)
   - [Usage Tutorial: See a step-by-step tutorial here.](https://github.com/lrse/whycon/wiki/Tutorial)
 
-- run the code
+- **run the code**
 
-```shell
-# change device depends on connection
-roslaunch cv_camera cv_camera_only.launch device_id:=1
-roslaunch whycon yujie_whycon_rviz.launch
-```
+  ```shell
+  # change device depends on connection
+  roslaunch cv_camera cv_camera_only.launch device_id:=1
+  roslaunch whycon yujie_whycon_rviz.launch
+  ```
+
+- **using rosbag**
+  ```shell
+  roslaunch whycon yujie_whycon_rviz.launch
+  rosbag play -r 0.8 <whycon_xxx.bag>
+  ```
+  
+
+- note
+  - remember to remap topics in ROS!
+  - don't worry when you get warning!!!
+  - some function get changed in OpenCV4, such as `CV_AA` to `cv.LINE_AA`
 
 ### whycon-orig (deprecated)
 - code: https://github.com/gestom/whycon-orig/tree/opencv
@@ -112,6 +124,14 @@ cd src/
 make CXX=clang
 # Error
 ```
+
+## rosbag
+
+- ```shell
+  rosbag recond -a
+  rosbag recond /topic_name
+  rosbag play -r 0.8 <bag_name>
+  ```
 
 ## Misc.
 
