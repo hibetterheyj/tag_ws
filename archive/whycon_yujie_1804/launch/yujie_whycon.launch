@@ -2,7 +2,7 @@
   <arg name="name" default="whycon"/>
   <arg name="targets" default="1"/>
 
-  <group ns="camera">
+  <group ns="cv_camera">
     <node pkg="image_proc" type="image_proc" name="image_proc"/>
   </group>
 
@@ -13,4 +13,3 @@
 
   <node name="transformer" type="transformer" pkg="whycon" output="screen"/>
 </launch>
-  

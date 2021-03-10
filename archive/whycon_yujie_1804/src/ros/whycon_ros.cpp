@@ -14,7 +14,9 @@ whycon::WhyConROS::WhyConROS(ros::NodeHandle& n) : is_tracking(false), should_re
 	similarity.setIdentity();
 
   if (!n.getParam("targets", targets)) throw std::runtime_error("Private parameter \"targets\" is missing");
-
+  // yujie0310
+  // n.param("config_file_path", config_file_path, std::string("$HOME/.ros/camera_info/camera"));
+  n.param("config_file_path", config_file_path, std::string("/home/yhe/.ros/camera_info/camera"));
   n.param("name", frame_id, std::string("whycon"));
 	n.param("world_frame", world_frame_id, std::string("world"));
   n.param("max_attempts", max_attempts, 1);
@@ -146,9 +148,10 @@ void whycon::WhyConROS::publish_results(const std_msgs::Header& header, const cv
   } 
 }
 
+// yujie0310
 void whycon::WhyConROS::load_transforms(void)
 {
-	std::string filename = frame_id + "_transforms.yml";
+	std::string filename = config_file_path + ".yaml";
 	ROS_INFO_STREAM("Loading file " << filename);
 
 	std::ifstream file(filename);

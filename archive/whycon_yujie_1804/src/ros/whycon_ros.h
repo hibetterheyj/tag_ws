@@ -26,6 +26,7 @@ namespace whycon {
       bool is_tracking, should_reset;
       int max_attempts, max_refine;
       std::string world_frame_id, frame_id;
+      std::string config_file_path;
 			int targets;
       double xscale, yscale;
 

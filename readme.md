@@ -44,6 +44,20 @@
     roslaunch cv_camera cv_camera_view.launch device_id:=1
     ```
 
+  - rectified images
+    - method1 (two files)
+
+      ```shell
+      roslaunch cv_camera cv_camera_only.launch
+      roslaunch cv_camera rect_view.launch
+      ```
+
+    - method2 (one file)
+
+      ```shell
+      roslaunch cv_camera cv_camera_view_rect.launch
+      ```
+
 - parameters
   - `~camera_info_url (string)` – url of camera info yaml.
 
@@ -81,6 +95,12 @@ then change the `CMakeLists.txt` by setting specfic version, such as `find_packa
 - wiki: https://github.com/lrse/whycon/wiki
   - [Reference: A description of the ROS nodes can be found here](https://github.com/lrse/whycon/wiki/Reference)
   - [Usage Tutorial: See a step-by-step tutorial here.](https://github.com/lrse/whycon/wiki/Tutorial)
+
+- run the code
+
+```shell
+ros
+```
 
 ### whycon-orig (deprecated)
 - code: https://github.com/gestom/whycon-orig/tree/opencv
