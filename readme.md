@@ -99,7 +99,9 @@ then change the `CMakeLists.txt` by setting specfic version, such as `find_packa
 - run the code
 
 ```shell
-ros
+# change device depends on connection
+roslaunch cv_camera cv_camera_only.launch device_id:=1
+roslaunch whycon yujie_whycon_rviz.launch
 ```
 
 ### whycon-orig (deprecated)
