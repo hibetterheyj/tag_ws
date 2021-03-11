@@ -1,26 +1,20 @@
 # Marker detection
 
+⭐ some huge files can be found [here](https://drive.google.com/drive/folders/1qwV2kRVkfSNCs9ddREWbypiysS995Kv9?usp=sharing)
+
 ## Work with camera
-
-### shell
-
-- list cameras and its permissions
-  
-  - `ll /dev/video*`
-- cannot access camare
-  
-  - `chmod 777 /dev/video1`
 
 ### guvcview
 
 - sudo apt install guvcview
-    1. Check the available resolutions, framerates and formats of your USB camera by running
+    1. Check the available resolutions, framerates and formats of your USB camera by running: `guvcview --device=/dev/video1`
 
-       ```shell
-       guvcview --device=/dev/video1
-       ```
+    2. Run guvcview and adjust your camera settings (exposure, brightness etc)
 
-    2. Run guvcview and adjust your camera settings (exposure, brightness etc).
+### shell
+
+- list cameras and its permissions: `ll /dev/video*`
+- cannot access camera: `chmod 777 /dev/video1`
 
 ---
 
@@ -64,10 +58,7 @@
   
 - rostopic published by cv_camera
 
-### image_proc
-
-- http://wiki.ros.org/image_proc
-- https://answers.ros.org/question/208724/how-to-run-image_proc-with-roslaunch/
+### [image_proc](http://wiki.ros.org/image_proc)
 
 ### vision_opencv
 
@@ -78,11 +69,9 @@ git checkout melodic
 
 then change the `CMakeLists.txt` by setting specfic version, such as `find_package(OpenCV 3.4 REQUIRED`
 
-### whycon
+### [lrse/whycon](https://github.com/lrse/whycon)
 
-- code: https://github.com/lrse/whycon
-
-- wiki: https://github.com/lrse/whycon/wiki
+- [wiki](https://github.com/lrse/whycon/wiki)
   - [Reference: A description of the ROS nodes can be found here](https://github.com/lrse/whycon/wiki/Reference)
   - [Usage Tutorial: See a step-by-step tutorial here.](https://github.com/lrse/whycon/wiki/Tutorial)
 
@@ -133,7 +122,7 @@ then change the `CMakeLists.txt` by setting specfic version, such as `find_packa
 
       - results
 
-        ```
+        ```shell
         examineCircle: 8.91499999999999985598325702441e-05  fps: 11217.0499158721249841619282961 pix: 749 490
         examineCircle: 2.08749999999999991877157323739e-05  fps: 47904.1916167664676322601735592 pix: 215 490
         examineCircle: 9.25059999999999982766771267073e-05  fps: 10810.1096145114915998419746757 pix: 766 493
@@ -142,23 +131,23 @@ then change the `CMakeLists.txt` by setting specfic version, such as `find_packa
         examineCircle: 2.40820000000000008393615663627e-05  fps: 41524.7902998089848551899194717 pix: 214 492
         ```
 
-    - overall speed: 
+    - overall speed
 
       - implementation
 
-        ```
-          // yujie0311
-          int64_t ticks = cv::getTickCount();
-        
-          is_tracking = system->localize(image, should_reset/*!is_tracking*/, max_attempts, max_refine);
-        
-            double delta = (double)(cv::getTickCount() - ticks) / cv::getTickFrequency();
-            cout << "checking circle and compute distance: " << delta << " " << " fps: " << 1/delta << endl;
+        ```c++
+        // yujie0311
+        int64_t ticks = cv::getTickCount();
+      
+        is_tracking = system->localize(image, should_reset/*!is_tracking*/, max_attempts, max_refine);
+      
+          double delta = (double)(cv::getTickCount() - ticks) / cv::getTickFrequency();
+          cout << "checking circle and compute distance: " << delta << " " << " fps: " << 1/delta << endl;
         ```
 
       - results
 
-        ```
+        ```shell
         checking circle and compute distance: 0.000344053999999999996113608791148  fps: 2906.52048806292032168130390346
         checking circle and compute distance: 0.000346080999999999981957959915846  fps: 2889.49696747293273801915347576
         checking circle and compute distance: 0.000347040000000000011231432450742  fps: 2881.51221761180249814060516655
@@ -207,13 +196,11 @@ then change the `CMakeLists.txt` by setting specfic version, such as `find_packa
 
 - warp1337/ros_aruco: <https://github.com/warp1337/ros_aruco>
 
-#### whycon-orig (deprecated)
+#### [whycon-orig (deprecated)](https://github.com/gestom/whycon-orig/tree/opencv)
 
-- code: https://github.com/gestom/whycon-orig/tree/opencv
+## Misc
 
-## Misc.
-
-- apriltag only works when using `catkin build` https://github.com/AprilRobotics/apriltag_ros
+- apriltag only works when using `catkin build` <https://github.com/AprilRobotics/apriltag_ros>
 - ⭐ add delay time in launch files
 
   ```xml
