@@ -89,8 +89,8 @@ then change the `CMakeLists.txt` by setting specfic version, such as `find_packa
 - **using rosbag**
 
   ```shell
-  roslaunch whycon yujie_whycon_rviz.launch
-  rosbag play -r 0.8 <whycon_xxx.bag>
+  roslaunch whycon yujie_whycon_rviz_rosbag.launch
+  roslaunch whycon yujie_whycon_rviz_rosbag.launch bag_name:=whycon_short_0311
   ```
 
 - Note
@@ -114,55 +114,52 @@ then change the `CMakeLists.txt` by setting specfic version, such as `find_packa
 
     ---
 
-    - **Efficiency summary: If the target is tracked continuously, the whycon algorithm runs extremely fast, more than 2000fps, if the target is lost, it will take extra time to find the target using the whole image, running at the speed of about 50-100 fps.**
+#### summary and experiments
 
-    - speed when examining Circle
+- its robustness and accuracy is not sensitive regarding the resolution and the focal length of the camera
 
-      - `examineCircle(image, outer, ii, outerAreaRatio, search_in_window)`
+- valid from 0.2m to more than 6m when using whycon marker with largest diameter is about square size = 0.200m on A4 paper and the camera with 640x480 resolution
 
-      - results
+- **Efficiency summary: If the target is tracked continuously, the whycon algorithm runs extremely fast, more than 2000fps, if the target is lost, it will take extra time to find the target using the whole image, running at the speed of about 50-100 fps.**
 
-        ```shell
-        examineCircle: 8.91499999999999985598325702441e-05  fps: 11217.0499158721249841619282961 pix: 749 490
-        examineCircle: 2.08749999999999991877157323739e-05  fps: 47904.1916167664676322601735592 pix: 215 490
-        examineCircle: 9.25059999999999982766771267073e-05  fps: 10810.1096145114915998419746757 pix: 766 493
-        examineCircle: 2.51289999999999994547295739666e-05  fps: 39794.6595566874966607429087162 pix: 211 493
-        examineCircle: 9.94279999999999973938138997376e-05  fps: 10057.5290662590014107991009951 pix: 774 492
-        examineCircle: 2.40820000000000008393615663627e-05  fps: 41524.7902998089848551899194717 pix: 214 492
-        ```
+- overall speed
 
-    - overall speed
+  - implementation
 
-      - implementation
+    ```c++
+    // yujie0311
+    int64_t ticks = cv::getTickCount();
+  
+    is_tracking = system->localize(image, should_reset/*!is_tracking*/, max_attempts, max_refine);
+  
+    double delta = (double)(cv::getTickCount() - ticks) / cv::getTickFrequency();
+    cout << "checking circle and compute distance: " << delta << " " << " fps: " << 1/delta << endl;
+    ```
 
-        ```c++
-        // yujie0311
-        int64_t ticks = cv::getTickCount();
-      
-        is_tracking = system->localize(image, should_reset/*!is_tracking*/, max_attempts, max_refine);
-      
-          double delta = (double)(cv::getTickCount() - ticks) / cv::getTickFrequency();
-          cout << "checking circle and compute distance: " << delta << " " << " fps: " << 1/delta << endl;
-        ```
+  - results: 
+    - **personal PC** Intel® Core™ i7-6700HQ CPU @ 2.60GHz × 8: more than 50 Hz when finding whycon and more than 2000 Hz when keeping tracking
+    - **student room PC** Intel® Core™ i7-6700 CPU @ 3.40GHz × 8: more than 200 Hz when finding whycon and more than 10000 Hz when keeping tracking
 
-      - results
+    ```shell
+    # personal
+    checking circle and compute distance: 0.000344053999999999996113608791148  fps: 2906.52048806292032168130390346
+    checking circle and compute distance: 0.000346080999999999981957959915846  fps: 2889.49696747293273801915347576
+    checking circle and compute distance: 0.000347040000000000011231432450742  fps: 2881.51221761180249814060516655
+    checking circle and compute distance: 0.0199971720000000005579288142599  fps: 50.0070709998393780892911308911
+    checking circle and compute distance: 0.021584013999999998589807148619  fps: 46.3305852192275295919898780994
+    checking circle and compute distance: 0.00624448899999999976900832976412  fps: 160.141206109899457032952341251
+    checking circle and compute distance: 0.00618661599999999981674969617984  fps: 161.639254804241943475062726066
+    # student room
+    checking circle and compute distance: 0.00479298200000000031856250970463  fps: 208.638380031471001530007924885
+    checking circle and compute distance: 0.00158503099999999998333255479821  fps: 630.902487080694299947936087847
+    checking circle and compute distance: 0.00564151199999999956868901307416  fps: 177.25744445815237781971518416
+    checking circle and compute distance: 0.00550736699999999999161071073672  fps: 181.574970398740447308227885514
+    checking circle and compute distance: 4.65889999999999972766021039128e-05  fps: 21464.294146686988824512809515
+    checking circle and compute distance: 7.81700000000000054306212304844e-05  fps: 12792.6314442880884598707780242
+    checking circle and compute distance: 7.31769999999999941125636282457e-05  fps: 13665.4959891769285604823380709
+    ```
 
-        ```shell
-        checking circle and compute distance: 0.000344053999999999996113608791148  fps: 2906.52048806292032168130390346
-        checking circle and compute distance: 0.000346080999999999981957959915846  fps: 2889.49696747293273801915347576
-        checking circle and compute distance: 0.000347040000000000011231432450742  fps: 2881.51221761180249814060516655
-        checking circle and compute distance: 0.0199971720000000005579288142599  fps: 50.0070709998393780892911308911
-        checking circle and compute distance: 0.021584013999999998589807148619  fps: 46.3305852192275295919898780994
-        checking circle and compute distance: 0.00624448899999999976900832976412  fps: 160.141206109899457032952341251
-        checking circle and compute distance: 0.00618661599999999981674969617984  fps: 161.639254804241943475062726066
-        checking circle and compute distance: 0.00670624900000000006422551379615  fps: 149.114654108429306234029354528
-        checking circle and compute distance: 0.0221067970000000009467289174836  fps: 45.2349564706275586445372027811
-        checking circle and compute distance: 0.0131158100000000003154676520012  fps: 76.2438614161077339304029010236
-        checking circle and compute distance: 0.000383309999999999987535526102533  fps: 2608.85445201012225879821926355
-        checking circle and compute distance: 0.0155065110000000005996412255627  fps: 64.4890394750953248603764222935
-        ```
-
-  - **can run as a mavconn service, outputting pose information through bus**
+- **can run as a mavconn service, outputting pose information through bus**
 
 - :construction: Warning
   
@@ -185,6 +182,90 @@ then change the `CMakeLists.txt` by setting specfic version, such as `find_packa
     cv::line(image, cv::Point(x + v0 * m0 * 2, y + v1 * m0 * 2), cv::Point(x - v0 * m0 * 2, y - v1 * m0 * 2), cv::Scalar(color_), 2, 8);
     cv::line(image, cv::Point(x + v1 * m1 * 2, y - v0 * m1 * 2), cv::Point(x - v1 * m1 * 2, y + v0 * m1 * 2), cv::Scalar(color_), 2, 8); 
     ```
+
+### aruco_yujie
+
+> modified from <https://github.com/CesMak/aruco_detector_ocv.git>
+
+- installation
+
+  ```c++
+  // first introduced in OpenCV 3.3.0
+  // https://docs.opencv.org/3.2.0/d9/d6a/group__aruco.html
+  // https://docs.opencv.org/3.3.0/d9/d6a/group__aruco.html
+  // https://stackoverflow.com/questions/56318165/error-struct-cvarucodetectorparameters-has-no-member-named-cornerrefinem
+  // detector_params->cornerRefinementMethod = aruco::CORNER_REFINE_SUBPIX;
+  ```
+
+#### Summary
+
+- valid between 0.35m and 3.3m when using 5x5 aruco marker with square size = 0.178m on an A4 paper and the camera with 640x480 resolution
+- its robustness is highly dependant on the resolution and the focal length of the camera
+
+- Note
+
+  - tracking and count fps in `circle_detector.cpp`
+
+    ```c++
+    int64_t ticks = cv::getTickCount();
+
+    // Smooth the image to improve detection results
+    if (enable_blur) {
+        GaussianBlur(image, image, Size(blur_window_size, blur_window_size), 0,
+                     0);
+    }
+
+    // Detect the markers
+    vector<int> ids;
+    vector<vector<Point2f>> corners, rejected;
+    aruco::detectMarkers(image, dictionary, corners, ids, detector_params, rejected);
+
+    double delta = (double)(cv::getTickCount() - ticks) / cv::getTickFrequency();
+    cout << "checking aruco: " << delta << " " << " fps: " << 1/delta << endl;
+    ```
+
+  - results: 
+    - **personal PC** Intel® Core™ i7-6700HQ CPU @ 2.60GHz × 8: TODO
+    - **student room PC** Intel® Core™ i7-6700 CPU @ 3.40GHz × 8: about 200-270Hz 
+
+    ```shell
+    checking aruco: 0.00360592  fps: 277.322  Duration: 6.964317 / 18.342437               
+    checking aruco: 0.00417863  fps: 239.313  Duration: 7.661093 / 18.342437               
+    checking aruco: 0.003542  fps: 282.3273   Duration: 7.696345 / 18.342437               
+    checking aruco: 0.00389679  fps: 256.621  Duration: 7.729125 / 18.342437               
+    checking aruco: 0.00437748  fps: 228.442  Duration: 7.765037 / 18.342437               
+    checking aruco: 0.00358874  fps: 278.649  Duration: 7.800346 / 18.342437               
+    checking aruco: 0.00382045  fps: 261.749  Duration: 7.836576 / 18.342437               
+    checking aruco: 0.00346087  fps: 288.944  Duration: 7.868440 / 18.342437               
+    checking aruco: 0.00360971  fps: 277.03   Duration: 7.904529 / 18.342437               
+    checking aruco: 0.00411221  fps: 243.178  Duration: 7.944021 / 18.342437               
+    checking aruco: 0.00354886  fps: 281.781  Duration: 7.972599 / 18.342437               
+    checking aruco: 0.00376028  fps: 265.938  Duration: 8.008783 / 18.342437               
+    checking aruco: 0.00533363  fps: 187.489  Duration: 8.049162 / 18.342437               
+    checking aruco: 0.00486725  fps: 205.455  Duration: 8.081169 / 18.342437               
+    checking aruco: 0.00531744  fps: 188.06   Duration: 8.112955 / 18.342437               
+    checking aruco: 0.00375941  fps: 265.999  Duration: 8.148339 / 18.342437               
+    checking aruco: 0.00441694  fps: 226.401  Duration: 8.185057 / 18.342437               
+    checking aruco: 0.00361358  fps: 276.734  Duration: 8.216561 / 18.342437
+    ```
+
+#### command line
+
+- **run the code**
+
+  ```shell
+  # change device depends on connection
+  # roslaunch cv_camera cv_camera_view_rect.launch
+  roslaunch cv_camera cv_camera_only.launch
+  # with RVIZ
+  roslaunch aruco_yujie aruco_yujie_5_5.launch
+  ```
+
+- **using rosbag**
+
+  ```shell
+  roslaunch aruco_yujie aruco_yujie_5_5_rosbag.launch
+  ```
 
 ### aruco_ros
 

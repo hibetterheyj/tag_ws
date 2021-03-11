@@ -34,6 +34,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/aruco.hpp>
 #include <opencv2/imgproc.hpp>
+// #include <opencv2/opencv.hpp>
 
 using namespace std;
 using namespace sensor_msgs;
@@ -140,6 +141,9 @@ void callback(const ImageConstPtr &image_msg) {
     auto image = cv_bridge::toCvShare(image_msg)->image;
     cv::Mat display_image(image);
 
+    //yujie0311
+    int64_t ticks = cv::getTickCount();
+
     // Smooth the image to improve detection results
     if (enable_blur) {
         GaussianBlur(image, image, Size(blur_window_size, blur_window_size), 0,
@@ -150,6 +154,9 @@ void callback(const ImageConstPtr &image_msg) {
     vector<int> ids;
     vector<vector<Point2f>> corners, rejected;
     aruco::detectMarkers(image, dictionary, corners, ids, detector_params, rejected);
+
+    double delta = (double)(cv::getTickCount() - ticks) / cv::getTickFrequency();
+    cout << "checking aruco: " << delta << " " << " fps: " << 1/delta << endl;
 
     // publish aruco info:
     aruco_yujie::ArucoInfo ar_msg;
@@ -388,7 +395,11 @@ int main(int argc, char **argv) {
     nh.param("min_prec_value", min_prec_value, 80);
 
     detector_params = aruco::DetectorParameters::create();
-    detector_params->cornerRefinementMethod = aruco::CORNER_REFINE_SUBPIX;
+    // first introduced in OpenCV 3.3.0
+    // https://docs.opencv.org/3.2.0/d9/d6a/group__aruco.html
+    // https://docs.opencv.org/3.3.0/d9/d6a/group__aruco.html
+    // https://stackoverflow.com/questions/56318165/error-struct-cvarucodetectorparameters-has-no-member-named-cornerrefinem
+    // detector_params->cornerRefinementMethod = aruco::CORNER_REFINE_SUBPIX;
     nh.param("dictionary_name", dictionary_name, string("DICT_4X4_250"));
     nh.param("aruco_adaptiveThreshWinSizeStep", detector_params->adaptiveThreshWinSizeStep, 4);
     int queue_size = 10;

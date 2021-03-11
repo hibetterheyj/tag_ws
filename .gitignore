@@ -4,4 +4,4 @@ build/
 .catkin_tools/
 .vscode/
 src/CMakeLists.txt
-rosbag/*.bag
+*.bag

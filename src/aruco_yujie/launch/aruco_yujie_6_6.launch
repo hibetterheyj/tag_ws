@@ -1,0 +1,33 @@
+<launch>
+  <arg name="use_rviz" default="True" />
+
+  <arg name="image_width" default="640" /> <!-- 640, 1920 -->
+  <arg name="image_height" default="480" /> <!-- 480, 1080 -->
+  <arg name="camera" default="/cv_camera/image_raw" />
+  <arg name="camera_info" default="/cv_camera/camera_info" />
+  <arg name="tf_prefix" default="marker_id" />
+  <arg name="show_detections" default="true" />
+  <arg name="marker_size" default="0.174" doc="length of the physical marker's side in meters"/>
+  <arg name="dictionary_name" default="DICT_6x6_1000" />
+  <arg name="blur_window_size" default="7" />
+  <arg name="num_detected" default="25" /><!-- 0: do not use it, -->
+  <arg name="min_prec_value" default="50" /><!-- 0: do not use it, 80 means aruco marker must be detected in 80% of the last pics to be displayed -->
+
+  <node pkg="aruco_yujie" type="node" name="aruco_yujie" output="screen">
+    <param name="camera" type="string" value="$(arg camera)"/>
+    <param name="camera_info" type="string" value="$(arg camera_info)"/>
+    <param name="tf_prefix" type="string" value="$(arg tf_prefix)"/>
+    <param name="show_detections" type="bool" value="$(arg show_detections)"/>
+    <param name="marker_size" type="double" value="$(arg marker_size)"/>
+    <param name="dictionary_name" type="string" value="$(arg dictionary_name)"/>
+    <param name="image_width" type="double" value="$(arg image_width)"/>
+    <param name="image_height" type="double" value="$(arg image_height)"/>
+    <param name="blur_window_size" type="double" value="$(arg blur_window_size)"/>
+    <param name="num_detected" type="double" value="$(arg num_detected)"/>
+    <param name="min_prec_value" type="double" value="$(arg min_prec_value)"/>
+  </node>
+
+   <group if="$(arg use_rviz)" >
+        <node pkg="rviz" type="rviz" name="markers_extrinsic" args="-d $(find aruco_yujie)/launch/aruco_opencv.rviz"/>
+    </group>
+</launch>
