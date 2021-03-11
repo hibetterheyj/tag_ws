@@ -58,7 +58,13 @@ void whycon::WhyConROS::on_image(const sensor_msgs::ImageConstPtr& image_msg, co
   if (!system)
     system = boost::make_shared<whycon::LocalizationSystem>(targets, image.size().width, image.size().height, cv::Mat(camera_model.fullIntrinsicMatrix()), cv::Mat(camera_model.distortionCoeffs()), parameters);
 
+  // yujie0311
+  int64_t ticks = cv::getTickCount();
+
   is_tracking = system->localize(image, should_reset/*!is_tracking*/, max_attempts, max_refine);
+
+    double delta = (double)(cv::getTickCount() - ticks) / cv::getTickFrequency();
+    std::cout << "checking circle and compute distance: " << delta << " " << " fps: " << 1/delta << std::endl;
 
   if (is_tracking) {
     publish_results(image_msg->header, cv_ptr);

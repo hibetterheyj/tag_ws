@@ -67,7 +67,7 @@ inline int whycon::CircleDetector::threshold_pixel(uchar* ptr)
 
 bool whycon::CircleDetector::examineCircle(const cv::Mat& image, whycon::CircleDetector::Circle& circle, int ii, float areaRatio, bool search_in_window)
 {
-  //int64_t ticks = cv::getTickCount();  
+//   int64_t ticks = cv::getTickCount();  
   // get shorter names for elements in Context
 	vector<int>& buffer = context->buffer;
   vector<int>& queue = context->queue;
@@ -206,8 +206,8 @@ bool whycon::CircleDetector::examineCircle(const cv::Mat& image, whycon::CircleD
 	}
 	else WHYCON_DEBUG("not large enough (" << circle.size << "/" << parameters.min_size << ")");
 
-  //double delta = (double)(cv::getTickCount() - ticks) / cv::getTickFrequency();
-  //cout << "examineCircle: " << delta << " " << " fps: " << 1/delta << " pix: " << circle.size << " " << threshold << endl;
+//   double delta = (double)(cv::getTickCount() - ticks) / cv::getTickFrequency();
+//   cout << "examineCircle: " << delta << " " << " fps: " << 1/delta << " pix: " << circle.size << " " << threshold << endl;
 
 	return result;
 }
@@ -482,13 +482,15 @@ void whycon::CircleDetector::Circle::draw(cv::Mat& image, const std::string& tex
     if (fxi >= 0 && fxi < image.cols && fyi >= 0 && fyi < image.rows)
       image.at<cv::Vec3b>(fyi, fxi) = color;
   }
-  
-  float scale = image.size().width / 1800.0f;
+  //  yujie0311
+  //  float scale = image.size().width / 1800.0f;
+  float scale = image.size().width / 800.0f;
+  cv::Scalar color_ = cv::Scalar(0, 0, 0);
   //float thickness = scale * 3.0;
   //if (thickness < 1) thickness = 1;
-  cv::putText(image, text.c_str(), cv::Point(x + 2 * m0, y + 2 * m1), CV_FONT_HERSHEY_SIMPLEX, scale, cv::Scalar(color), thickness, CV_AA);
-  cv::line(image, cv::Point(x + v0 * m0 * 2, y + v1 * m0 * 2), cv::Point(x - v0 * m0 * 2, y - v1 * m0 * 2), cv::Scalar(color), 1, 8);
-  cv::line(image, cv::Point(x + v1 * m1 * 2, y - v0 * m1 * 2), cv::Point(x - v1 * m1 * 2, y + v0 * m1 * 2), cv::Scalar(color), 1, 8); 
+  cv::putText(image, text.c_str(), cv::Point(x + 2 * m0, y + 2 * m1), CV_FONT_HERSHEY_SIMPLEX, scale, cv::Scalar(color_), 2, CV_AA);
+  cv::line(image, cv::Point(x + v0 * m0 * 2, y + v1 * m0 * 2), cv::Point(x - v0 * m0 * 2, y - v1 * m0 * 2), cv::Scalar(color_), 2, 8);
+  cv::line(image, cv::Point(x + v1 * m1 * 2, y - v0 * m1 * 2), cv::Point(x - v1 * m1 * 2, y + v0 * m1 * 2), cv::Scalar(color_), 2, 8); 
 }
 
 void whycon::CircleDetector::Circle::write(cv::FileStorage& fs) const {

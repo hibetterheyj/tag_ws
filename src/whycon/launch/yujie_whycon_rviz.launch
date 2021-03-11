@@ -1,15 +1,12 @@
 <launch>
+  <!-- ARG -->
   <arg name="name" default="whycon"/>
   <arg name="targets" default="1"/>
 
+  <!-- NODE -->
   <group ns="cv_camera">
     <node pkg="image_proc" type="image_proc" name="image_proc"/>
   </group>
-
-  <!-- <node name="image_rect" pkg="image_view" type="image_view" respawn="false" output="screen">
-    <remap from="image" to="/cv_camera/image_rect_color" />
-    <param name="autosize" value="true" />
-  </node> -->
 
   <node name="whycon" type="whycon" pkg="whycon" output="screen">
     <param name="targets" value="$(arg targets)"/>
@@ -21,8 +18,4 @@
   <node name="transformer" type="transformer" pkg="whycon" output="screen"/>
   
   <node pkg="rviz" type="rviz" name="rviz" args="-d $(find whycon)/launch/whycon.rviz" />
-  <!-- <node name="whycon_image_out" pkg="image_view" type="image_view" respawn="false" output="screen">
-    <remap from="image" to="/whycon/image_out" />
-    <param name="autosize" value="true" />
-  </node> -->
 </launch>
