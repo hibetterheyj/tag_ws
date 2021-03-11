@@ -128,4 +128,23 @@ then change the `CMakeLists.txt` by setting specfic version, such as `find_packa
   <arg name="node_start_delay" default="1.0" />  
   <node name="listener" pkg="roscpp_tutorials" type="listener" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' " />
   ```
-  
+
+## Problems
+
+- **[fixed]** [ros-perception/image_common/camera_info_manager/src/camera_info_manager.cpp](https://github.com/ros-perception/image_common/blob/noetic-devel/camera_info_manager/src/camera_info_manager.cpp)
+
+  Question: If I set a custom path such as src/cv_camera/config/camera.yaml, I will encounter this error
+
+    ```shell
+    [ERROR] [1615434795.397894710]: cv camera open failed: file /home/he/Desktop/TagDection/tag_ws/devel/share/cv_camera/../../../src/cv_camera/config/trust_webcam/camera.yaml cannot be opened
+    [cv_camera-1] process has died [pid 1973, exit code 1, cmd /home/he/Desktop/TagDection/tag_ws/devel/lib/cv_camera/cv_camera_node __name:=cv_camera __log:=/home/he/.ros/log/a69d5f7c-821b-11eb-bb8a-f0038c0ab1cd/cv_camera-1.log].
+    log file: /home/he/.ros/log/a69d5f7c-821b-11eb-bb8a-f0038c0ab1cd/cv_camera-1*.log
+    ```
+
+  - fix in two ways
+    1. `cp src/cv_camera/config/camera.yaml ~/.ros/camera_info/camera.yaml`
+    2. writing the following command in the launch file
+
+    ```xml
+    <arg name="calib_file_path" default="file://$(find cv_camera)/config/trust_webcam/camera.yaml" />
+    ```

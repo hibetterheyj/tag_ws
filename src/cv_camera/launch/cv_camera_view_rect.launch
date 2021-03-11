@@ -3,13 +3,11 @@
   <!-- https://wiki.ros.org/cv_camera -->
   <!-- ARGS-->
   <arg name="device_id" default="0" />
-  <arg name="calib_file_path" default="$(find cv_camera)/config/trust_webcam/camera.yaml" />
+  <!-- default_camera_info_url = "file://${ROS_HOME}/camera_info/${NAME}.yaml"-->
+  <arg name="calib_file_path" default="file://$(find cv_camera)/config/trust_webcam/camera.yaml" />
   <arg name="node_start_delay" default="1.0" />
 
-  <!--
-    roslaunch cv_camera cv_camera_view.launch device_id:=1
-  to change between different camera!
-  -->
+  <!--roslaunch cv_camera cv_camera_view.launch device_id:=1  -->
   <node name="cv_camera" pkg="cv_camera" type="cv_camera_node" output="screen" >
     <param name="device_id" value="$(arg device_id)" />
     <param name="camera_info_url" value="$(arg calib_file_path)" />

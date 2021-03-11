@@ -1,0 +1,3 @@
+[submodule "archive/aruco_detector_ocv"]
+	path = archive/aruco_detector_ocv
+	url = https://github.com/CesMak/aruco_detector_ocv.git

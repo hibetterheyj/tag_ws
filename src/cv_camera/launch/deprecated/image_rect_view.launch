@@ -7,7 +7,8 @@
   -->
   <!-- ARGS-->
   <arg name="device_id" default="0" />
-  <arg name="calib_file_path" default="$(find cv_camera)/config/trust_webcam/camera.yaml" />
+  <!-- default_camera_info_url = "file://${ROS_HOME}/camera_info/${NAME}.yaml"-->
+  <arg name="calib_file_path" default="file://$(find cv_camera)/config/trust_webcam/camera.yaml" />
 
   <!-- NODE-->
   <node name="cv_camera" pkg="cv_camera" type="cv_camera_node" output="screen" >
