@@ -137,8 +137,8 @@ then change the `CMakeLists.txt` by setting specfic version, such as `find_packa
     ```
 
   - results: 
-    - **personal PC** Intel® Core™ i7-6700HQ CPU @ 2.60GHz × 8: more than 50 Hz when finding whycon and more than 2000 Hz when keeping tracking
-    - **student room PC** Intel® Core™ i7-6700 CPU @ 3.40GHz × 8: more than 200 Hz when finding whycon and more than 10000 Hz when keeping tracking
+    - **personal computer** Intel® Core™ i7-6700HQ CPU @ 2.60GHz × 8: more than 50 Hz when finding whycon and more than 2000 Hz when keeping tracking
+    - **student room computer** Intel® Core™ i7-6700 CPU @ 3.40GHz × 8: more than 200 Hz when finding whycon and more than 10000 Hz when keeping tracking
 
     ```shell
     # personal
@@ -225,14 +225,24 @@ then change the `CMakeLists.txt` by setting specfic version, such as `find_packa
     ```
 
   - results: 
-    - **personal PC** Intel® Core™ i7-6700HQ CPU @ 2.60GHz × 8: TODO
-    - **student room PC** Intel® Core™ i7-6700 CPU @ 3.40GHz × 8: about 200-270Hz 
+    - **personal computer** Intel® Core™ i7-6700HQ CPU @ 2.60GHz × 8: about 170-260Hz (with some low points)
+    - **student room computer** Intel® Core™ i7-6700 CPU @ 3.40GHz × 8: about 190-290Hz 
 
     ```shell
-    checking aruco: 0.00360592  fps: 277.322  Duration: 6.964317 / 18.342437               
-    checking aruco: 0.00417863  fps: 239.313  Duration: 7.661093 / 18.342437               
-    checking aruco: 0.003542  fps: 282.3273   Duration: 7.696345 / 18.342437               
-    checking aruco: 0.00389679  fps: 256.621  Duration: 7.729125 / 18.342437               
+    # personal
+    checking aruco: 0.0047509  fps: 210.486   Duration: 7.765050 / 18.342437               
+    checking aruco: 0.00424327  fps: 235.667  Duration: 7.800998 / 18.342437
+    # some low points here
+    checking aruco: 0.0114855  fps: 87.0665   Duration: 7.844573 / 18.342437               
+    checking aruco: 0.015256  fps: 65.54829   Duration: 7.875542 / 18.342437               
+    checking aruco: 0.00584501  fps: 171.086  Duration: 7.908486 / 18.342437               
+    checking aruco: 0.00435351  fps: 229.699  Duration: 7.941409 / 18.342437               
+    checking aruco: 0.00375162  fps: 266.551  Duration: 7.972672 / 18.342437               
+    checking aruco: 0.0054297  fps: 184.172   Duration: 8.008810 / 18.342437               
+    checking aruco: 0.00457636  fps: 218.514  Duration: 8.044999 / 18.342437               
+    checking aruco: 0.00379929  fps: 263.207  Duration: 8.080643 / 18.342437               
+    checking aruco: 0.00415778  fps: 240.513  Duration: 8.112967 / 18.342437
+    # student room        
     checking aruco: 0.00437748  fps: 228.442  Duration: 7.765037 / 18.342437               
     checking aruco: 0.00358874  fps: 278.649  Duration: 7.800346 / 18.342437               
     checking aruco: 0.00382045  fps: 261.749  Duration: 7.836576 / 18.342437               
@@ -244,9 +254,6 @@ then change the `CMakeLists.txt` by setting specfic version, such as `find_packa
     checking aruco: 0.00533363  fps: 187.489  Duration: 8.049162 / 18.342437               
     checking aruco: 0.00486725  fps: 205.455  Duration: 8.081169 / 18.342437               
     checking aruco: 0.00531744  fps: 188.06   Duration: 8.112955 / 18.342437               
-    checking aruco: 0.00375941  fps: 265.999  Duration: 8.148339 / 18.342437               
-    checking aruco: 0.00441694  fps: 226.401  Duration: 8.185057 / 18.342437               
-    checking aruco: 0.00361358  fps: 276.734  Duration: 8.216561 / 18.342437
     ```
 
 #### command line
