@@ -16,7 +16,7 @@
 - sudo apt install guvcview
     1. Check the available resolutions, framerates and formats of your USB camera by running
 
-       ```
+       ```shell
        guvcview --device=/dev/video1
        ```
 
@@ -62,23 +62,9 @@
   - `~camera_info_url (string)` – url of camera info yaml.
 
 - rostopic published by cv_camera
-  ```
-  /cv_camera/camera_info
-  /cv_camera/image_raw
-  /cv_camera/image_raw/compressed
-  /cv_camera/image_raw/compressed/parameter_descriptions
-  /cv_camera/image_raw/compressed/parameter_updates
-  /cv_camera/image_raw/compressedDepth
-  /cv_camera/image_raw/compressedDepth/parameter_descriptions
-  /cv_camera/image_raw/compressedDepth/parameter_updates
-  /cv_camera/image_raw/theora
-  /cv_camera/image_raw/theora/parameter_descriptions
-  /cv_camera/image_raw/theora/parameter_updates
-  /rosout
-  /rosout_agg
-  ```
 
 ### image_proc
+
 - http://wiki.ros.org/image_proc
 - https://answers.ros.org/question/208724/how-to-run-image_proc-with-roslaunch/
 
@@ -88,9 +74,11 @@
 git clone https://github.com/ros-perception/vision_opencv.git
 git checkout melodic
 ```
+
 then change the `CMakeLists.txt` by setting specfic version, such as `find_package(OpenCV 3.4 REQUIRED`
 
 ### whycon
+
 - code: https://github.com/lrse/whycon
 - wiki: https://github.com/lrse/whycon/wiki
   - [Reference: A description of the ROS nodes can be found here](https://github.com/lrse/whycon/wiki/Reference)
@@ -105,6 +93,7 @@ then change the `CMakeLists.txt` by setting specfic version, such as `find_packa
   ```
 
 - **using rosbag**
+
   ```shell
   roslaunch whycon yujie_whycon_rviz.launch
   rosbag play -r 0.8 <whycon_xxx.bag>
@@ -117,30 +106,26 @@ then change the `CMakeLists.txt` by setting specfic version, such as `find_packa
   - some function get changed in OpenCV4, such as `CV_AA` to `cv.LINE_AA`
 
 ### aruco_ros
-- https://github.com/pal-robotics/aruco_ros
 
-### whycon-orig (deprecated)
+- pal-robotics/aruco_ros: <https://github.com/pal-robotics/aruco_ros>
+
+### deprecated
+
+#### ros_aruco (deprecated)
+
+- warp1337/ros_aruco: <https://github.com/warp1337/ros_aruco>
+
+#### whycon-orig (deprecated)
+
 - code: https://github.com/gestom/whycon-orig/tree/opencv
-
-```
-cd src/
-make CXX=clang
-# Error
-```
-
-## rosbag
-
-- ```shell
-  rosbag recond -a
-  rosbag recond /topic_name
-  rosbag play -r 0.8 <bag_name>
-  ```
 
 ## Misc.
 
 - apriltag only works when using `catkin build` https://github.com/AprilRobotics/apriltag_ros
 - ⭐ add delay time in launch files
+
   ```xml
   <arg name="node_start_delay" default="1.0" />  
   <node name="listener" pkg="roscpp_tutorials" type="listener" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' " />
   ```
+  
