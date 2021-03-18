@@ -6,7 +6,17 @@ add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
-        cv_bridge image_geometry geometry_msgs roscpp rospy std_msgs tf2 tf2_ros image_transport std_msgs message_generation)
+        cv_bridge
+        image_geometry
+        geometry_msgs
+        roscpp
+        rospy
+        std_msgs
+        tf2
+        tf2_ros
+        image_transport
+        message_generation
+)
 
 ## add info related to msg
 add_message_files(
@@ -23,7 +33,7 @@ generate_messages(
 ## catkin specific configuration ##
 ###################################
 catkin_package(
-        CATKIN_DEPENDS cv_bridge image_geometry geometry_msgs std_msgs roscpp rospy std_msgs tf2 tf2_ros  image_transport message_runtime
+        CATKIN_DEPENDS cv_bridge image_geometry geometry_msgs std_msgs roscpp rospy tf2 tf2_ros image_transport message_runtime
 )
 
 ###########
