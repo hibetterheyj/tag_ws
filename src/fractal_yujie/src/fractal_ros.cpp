@@ -1,8 +1,12 @@
-#include <csignal>
+// TODO:
+// extract corner infomation!
+// resolve relative pose
+// optimize the code
+
+#include <cmath>
+#include <fstream>
 #include <iostream>
-#include <map> // used for hashmap to give certainty
-#include <vector> // used in hashmap
-#include <numeric> // used for summing a vector
+#include <time.h>
 
 // ROS
 #include "ros/ros.h"
@@ -34,17 +38,22 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/aruco.hpp>
 #include <opencv2/imgproc.hpp>
-// #include <opencv2/opencv.hpp>
+#include <opencv2/calib3d/calib3d.hpp> // <opencv2/calib3d.hpp>
+
+// aruco/fractal
+#include <aruco.h>
+#include "cvdrawingutils.h"
 
 using namespace std;
 using namespace sensor_msgs;
 using namespace cv;
+using namespace aruco;
 
 // Publisher
 image_transport::Publisher result_img_pub_;
 ros::Publisher tf_list_pub_;
-ros::Publisher aruco_info_pub_;
-
+// ros::Publisher aruco_info_pub_;
+ros::Publisher fractal_info_pub_;
 
 #define SSTR(x) static_cast<std::ostringstream&>(std::ostringstream() << std::dec << x).str()
 #define ROUND2(x) std::round(x * 100) / 100
@@ -58,7 +67,6 @@ image_geometry::PinholeCameraModel camera_model;
 Mat distortion_coefficients;
 Matx33d intrinsic_matrix;
 Ptr<aruco::DetectorParameters> detector_params;
-Ptr<cv::aruco::Dictionary> dictionary;
 string marker_tf_prefix;
 int blur_window_size = 7;
 int image_fps = 30;
@@ -144,19 +152,22 @@ void callback(const ImageConstPtr &image_msg) {
     int64_t ticks = cv::getTickCount();
 
     // Smooth the image to improve detection results
-    if (enable_blur) {
-        GaussianBlur(image, image, Size(blur_window_size, blur_window_size), 0, 0);
-    }
+    // if (enable_blur) {
+    //     GaussianBlur(image, image, Size(blur_window_size, blur_window_size), 0, 0);
+    // }
 
     // Detect the markers
-    vector<int> ids;
-    vector<vector<Point2f>> corners, rejected;
-    aruco::detectMarkers(image, dictionary, corners, ids, detector_params, rejected);
+    // aruco
+    // vector<int> ids;
+    // vector<vector<Point2f>> corners, rejected;
+    // aruco::detectMarkers(image, dictionary, corners, ids, detector_params, rejected);
+    bool fractal_detected = FDetector.detect(image);
 
     double delta = (double)(cv::getTickCount() - ticks) / cv::getTickFrequency();
     cout << "checking aruco: " << delta << " " << " fps: " << 1/delta << endl;
 
     // publish aruco info:
+    // TODO: extract corner infomation!
     aruco_yujie::ArucoInfo ar_msg;
     for(int i = 0;i<ids.size();i++) {
         //std_msgs::Int16 id_num = ;
@@ -322,30 +333,7 @@ void callback(const ImageConstPtr &image_msg) {
 
 } // end of callback
 
-// TODO: slider extension
-// mach ne hashmap von int,array
-
 int main(int argc, char **argv) {
-    map<string, aruco::PREDEFINED_DICTIONARY_NAME> dictionary_names;
-    dictionary_names.insert(pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_4X4_50", aruco::DICT_4X4_50));
-    dictionary_names.insert(pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_4X4_100", aruco::DICT_4X4_100));
-    dictionary_names.insert(pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_4X4_250", aruco::DICT_4X4_250));
-    dictionary_names.insert(pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_4X4_1000", aruco::DICT_4X4_1000));
-    dictionary_names.insert(pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_5X5_50", aruco::DICT_5X5_50));
-    dictionary_names.insert(pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_5X5_100", aruco::DICT_5X5_100));
-    dictionary_names.insert(pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_5X5_250", aruco::DICT_5X5_250));
-    dictionary_names.insert(pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_5X5_1000", aruco::DICT_5X5_1000));
-    dictionary_names.insert(pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_6X6_50", aruco::DICT_6X6_50));
-    dictionary_names.insert(pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_6X6_100", aruco::DICT_6X6_100));
-    dictionary_names.insert(pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_6X6_250", aruco::DICT_6X6_250));
-    dictionary_names.insert(pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_6X6_1000", aruco::DICT_6X6_1000));
-    dictionary_names.insert(pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_7X7_50", aruco::DICT_7X7_50));
-    dictionary_names.insert(pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_7X7_100", aruco::DICT_7X7_100));
-    dictionary_names.insert(pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_7X7_250", aruco::DICT_7X7_250));
-    dictionary_names.insert(pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_7X7_1000", aruco::DICT_7X7_1000));
-    dictionary_names.insert(
-            pair<string, aruco::PREDEFINED_DICTIONARY_NAME>("DICT_ARUCO_ORIGINAL", aruco::DICT_ARUCO_ORIGINAL));
-
     signal(SIGINT, int_handler);
 
     // Initalize ROS node
@@ -365,34 +353,31 @@ int main(int argc, char **argv) {
     nh.param("num_detected", num_detected, 50);
     nh.param("min_prec_value", min_prec_value, 80);
 
-    detector_params = aruco::DetectorParameters::create();
-    // first introduced in OpenCV 3.3.0
-    // https://docs.opencv.org/3.2.0/d9/d6a/group__aruco.html
-    // https://docs.opencv.org/3.3.0/d9/d6a/group__aruco.html
-    // https://stackoverflow.com/questions/56318165/error-struct-cvarucodetectorparameters-has-no-member-named-cornerrefinem
-    // detector_params->cornerRefinementMethod = aruco::CORNER_REFINE_SUBPIX;
-    nh.param("dictionary_name", dictionary_name, string("DICT_4X4_250"));
-    nh.param("aruco_adaptiveThreshWinSizeStep", detector_params->adaptiveThreshWinSizeStep, 4);
+    // FRACTAL_2L_6 FRACTAL_3L_6 FRACTAL_4L_6 FRACTAL_5L_6
+    nh.param("dictionary_name", dictionary_name, string("FRACTAL_4L_6"));
     int queue_size = 10;
 
+    FractalDetector FDetector;
+    FDetector.setConfiguration(dictionary_name);
+
     // Configure ARUCO marker detector
-    dictionary = aruco::getPredefinedDictionary(dictionary_names[dictionary_name]);
+    // dictionary = aruco::getPredefinedDictionary(dictionary_names[dictionary_name]);
     ROS_DEBUG("%f", marker_size);
 
     if (show_detections) {
-       // namedWindow("markers", cv::WINDOW_KEEPRATIO);
+    // namedWindow("markers", cv::WINDOW_KEEPRATIO);
     }
     ros::Subscriber rgb_sub = nh.subscribe(rgb_topic.c_str(), queue_size, callback);
     ros::Subscriber rgb_info_sub = nh.subscribe(rgb_info_topic.c_str(), queue_size, callback_camera_info);
     ros::Subscriber parameter_sub = nh.subscribe("/update_params", queue_size, update_params_cb);
 
     // Publisher:
-  image_transport::ImageTransport it(nh);
-  result_img_pub_ = it.advertise("/result_img", 1);
-  tf_list_pub_    = nh.advertise<tf2_msgs::TFMessage>("/tf_list", 10);
+    image_transport::ImageTransport it(nh);
+    result_img_pub_ = it.advertise("/result_img", 1);
+    tf_list_pub_    = nh.advertise<tf2_msgs::TFMessage>("/tf_list", 10);
 
-  aruco_info_pub_ = nh.advertise<aruco_yujie::ArucoInfo>("/aruco_list", 10);
+    aruco_info_pub_ = nh.advertise<aruco_yujie::ArucoInfo>("/aruco_list", 10);
 
-  ros::spin();
-  return 0;
+    ros::spin();
+    return 0;
 }
