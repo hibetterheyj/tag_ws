@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
-set(OpenCV_DIR /usr/local/share/OpenCV)
+set(OpenCV_DIR "/home/lis/opencv-3.4.5/build/installed/share/OpenCV")
 project(cv_camera)
 
 find_package(catkin REQUIRED COMPONENTS
   image_transport roscpp cv_bridge sensor_msgs nodelet camera_info_manager roslint)
 
 #find_package(OpenCV 3.4 REQUIRED)
-find_package(OpenCV 3 REQUIRED)
+find_package(OpenCV 3 REQUIRED
+  PATHS /home/lis/opencv-3.4.5/build/installed/
+)
 
 find_package(Boost REQUIRED COMPONENTS system thread)
 

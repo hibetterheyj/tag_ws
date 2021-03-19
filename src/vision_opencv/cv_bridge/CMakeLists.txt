@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(cv_bridge)
+set(OpenCV_DIR "/home/lis/opencv-3.4.5/build/installed/share/OpenCV")
 
 find_package(catkin REQUIRED COMPONENTS rosconsole sensor_msgs)
 
@@ -13,8 +14,8 @@ if(NOT ANDROID)
 else()
 find_package(Boost REQUIRED)
 endif()
-#find_package(OpenCV 3.4 REQUIRED
-find_package(OpenCV 3 REQUIRED
+find_package(OpenCV REQUIRED
+  PATHS /home/lis/opencv-3.4.5/build/installed/
   COMPONENTS
     opencv_core
     opencv_imgproc
