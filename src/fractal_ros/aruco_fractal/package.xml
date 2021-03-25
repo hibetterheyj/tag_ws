@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>aruco_fractal</name>
+  <version>2.1.1</version>
+  <description>
+    utitlize the latest aruco 3.1.12 to build separate fractal library for fractal_ros
+  </description>
+  <maintainer email="he-yujie@outlook.com">Yujie He</maintainer>
+  <url type="website">http://yujie-he.github.io/</url>
+  <author email="yujie.he@epfl.ch">Yujie He</author>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>cv_bridge</depend>
+  <depend>eigen</depend>
+</package>
