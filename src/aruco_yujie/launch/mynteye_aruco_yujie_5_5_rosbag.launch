@@ -1,6 +1,7 @@
 <launch>
   <!-- ARG -->
-  <arg name="use_rviz" default="True" />
+  <arg name="use_rviz" default="False" />
+  <arg name="use_rqt_image_view" default="True" />
   <arg name="base_path" default="$(find aruco_yujie)/bags/" />
   <arg name="bag_name" default="example_aruco_whycon_13-53-03" />
 
@@ -33,7 +34,10 @@
     <param name="min_prec_value" type="double" value="$(arg min_prec_value)"/>
   </node>
 
-   <group if="$(arg use_rviz)" >
+   <!-- <group if="$(arg use_rviz)" >
         <node pkg="rviz" type="rviz" name="markers_extrinsic" args="-d $(find aruco_yujie)/launch/aruco_opencv_mynteye.rviz"/>
-    </group>
+    </group> -->
+  <group if="$(arg use_rqt_image_view)">
+    <node pkg="rqt_image_view" type="rqt_image_view" name="image_view_debug" args="/result_img" />
+  </group>
 </launch>

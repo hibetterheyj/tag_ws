@@ -176,7 +176,24 @@ void callback(const ImageConstPtr &image_msg) {
         if (show_detections) {
             //imshow("markers", display_image);
             if (result_img_pub_.getNumSubscribers() > 0) {
-                result_img_pub_.publish(cv_bridge::CvImage(std_msgs::Header(), "bgr8", display_image).toImageMsg());
+                 // yujie0325
+                 cout << "channel number:" << display_image.channels() << endl;
+                 // result_img_pub_.publish(cv_bridge::CvImage(std_msgs::Header(),
+                 // "bgr8", display_image).toImageMsg());
+                 if (display_image.channels() == 3){
+                   result_img_pub_.publish(
+                       cv_bridge::CvImage(std_msgs::Header(), "rgb8",
+                                          display_image)
+                           .toImageMsg());
+                 } else if (display_image.channels() == 1) {
+                   result_img_pub_.publish(
+                       // https://docs.ros.org/en/diamondback/api/cv_bridge/html/c++/cv__bridge_8cpp_source.html
+                       cv_bridge::CvImage(std_msgs::Header(), "mono8",
+                                          display_image)
+                           .toImageMsg());
+                 } else {
+                   ROS_ERROR("Unsupported channel number");
+                 }
             }
             auto key = waitKey(1);
             if (key == 27) {
@@ -209,8 +226,21 @@ void callback(const ImageConstPtr &image_msg) {
                 if(prec>=min_prec_value) {
                     Vec3d distance_z_first = translation_vectors[i];
                     double distance_z = ROUND3(distance_z_first[2]);
-                        cv::putText(display_image, "id: "+SSTR(ids[i])+" z dis: "+SSTR(distance_z)+" m  "+SSTR(ROUND2(prec))+" %", cv::Point(10, 70+i*30), cv::FONT_HERSHEY_SIMPLEX, 0.9, CV_RGB(0, 255, 0), 2);
-                        result_img_pub_.publish(cv_bridge::CvImage(std_msgs::Header(), "bgr8", display_image).toImageMsg());
+                    cv::putText(display_image, "id: "+SSTR(ids[i])+" z dis: "+SSTR(distance_z)+" m  "+SSTR(ROUND2(prec))+" %", cv::Point(10, 70+i*30), cv::FONT_HERSHEY_SIMPLEX, 0.9, CV_RGB(0, 255, 0), 2);
+                    // yujie0325
+                    // result_img_pub_.publish(cv_bridge::CvImage(std_msgs::Header(),
+                    // "bgr8", display_image).toImageMsg());
+                    if (display_image.channels() == 3){
+                      result_img_pub_.publish(
+                          cv_bridge::CvImage(std_msgs::Header(), "rgb8",
+                                             display_image)
+                              .toImageMsg());
+                    } else if (display_image.channels() == 1) {
+                      result_img_pub_.publish(
+                          cv_bridge::CvImage(std_msgs::Header(), "mono8",
+                                             display_image)
+                              .toImageMsg());
+                    }
                 }
             }
         }
