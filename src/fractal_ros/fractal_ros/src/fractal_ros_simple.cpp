@@ -36,7 +36,9 @@
 
 // aruco_fractal
 #include "aruco_fractal/aruco.h"
+#include "aruco_fractal/aruco_cvversioning.h"
 #include "aruco_fractal/cvdrawingutils.h"
+#include "aruco_fractal/fractaldetector.h"
 #include <fractal_msg/FractalInfo.h>
 
 using namespace std;
@@ -53,10 +55,13 @@ using namespace aruco;
 image_transport::Publisher result_img_pub_;
 ros::Publisher fractal_info_pub_;
 FractalDetector FDetector;
+// pose estimation
+aruco::CameraParameters cam_param;
+bool useRectifiedParameters = false;
 
 // Define global variables
 bool camera_model_computed = false;
-bool show_detections;
+bool show_detections, show_cube, show_axis;
 float marker_size;
 image_geometry::PinholeCameraModel camera_model;
 Mat distortion_coefficients;
@@ -111,10 +116,71 @@ tf2::Transform create_transform(const Vec3d &tvec,
   return transform;
 }
 
+aruco::CameraParameters
+rosCameraInfo2ArucoCamParams(const sensor_msgs::CameraInfo &cam_info,
+                             bool useRectifiedParameters) {
+  // height: 480
+// width: 640
+// distortion_model: "plumb_bob"
+// D: [-0.1716817860764946, -0.01225296373676225, 0.0003033307663812846, 0.002673568383939145, 0.0]
+// K: [687.8497246312774, 0.0, 300.7999356548882, 0.0, 691.6978616578762, 305.4399788765402, 0.0, 0.0, 1.0]
+// R: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+// P: [659.5717163085938, 0.0, 300.3917352603476, 0.0, 0.0, 672.5150756835938, 308.3962226994754, 0.0, 0.0, 0.0, 1.0, 0.0]
+// binning_x: 0
+// binning_y: 0
+// roi:
+//   x_offset: 0
+//   y_offset: 0
+//   height: 0
+//   width: 0
+//   do_rectify: False
+  cv::Mat cameraMatrix(3, 3, CV_64FC1);
+  cv::Mat distorsionCoeff(4, 1, CV_64FC1);
+  cv::Size size(cam_info.width, cam_info.height);
+
+  if (useRectifiedParameters) {
+    cameraMatrix.setTo(0);
+    cameraMatrix.at<double>(0, 0) = cam_info.P[0];
+    cameraMatrix.at<double>(0, 1) = cam_info.P[1];
+    cameraMatrix.at<double>(0, 2) = cam_info.P[2];
+    cameraMatrix.at<double>(0, 3) = cam_info.P[3];
+    cameraMatrix.at<double>(1, 0) = cam_info.P[4];
+    cameraMatrix.at<double>(1, 1) = cam_info.P[5];
+    cameraMatrix.at<double>(1, 2) = cam_info.P[6];
+    cameraMatrix.at<double>(1, 3) = cam_info.P[7];
+    cameraMatrix.at<double>(2, 0) = cam_info.P[8];
+    cameraMatrix.at<double>(2, 1) = cam_info.P[9];
+    cameraMatrix.at<double>(2, 2) = cam_info.P[10];
+    cameraMatrix.at<double>(2, 3) = cam_info.P[11];
+
+    for (int i = 0; i < 4; ++i)
+      distorsionCoeff.at<double>(i, 0) = 0;
+  } else {
+    for (int i = 0; i < 9; ++i)
+      cameraMatrix.at<double>(i % 3, i - (i % 3) * 3) = cam_info.K[i];
+
+    if (cam_info.D.size() == 4) {
+      for (int i = 0; i < 4; ++i)
+        distorsionCoeff.at<double>(i, 0) = cam_info.D[i];
+    } else {
+      // ROS_WARN("length of camera_info D vector is not 4, assuming zero
+      // distortion...");
+      ROS_WARN("length of camera_info D vector is not 4, set first 4 params");
+      for (int i = 0; i < 4; ++i)
+        // distorsionCoeff.at<double>(i, 0) = 0;
+        distorsionCoeff.at<double>(i, 0) = cam_info.D[i];
+    }
+  }
+
+  return aruco::CameraParameters(cameraMatrix, distorsionCoeff, size);
+}
+
 void callback_camera_info(const CameraInfoConstPtr &msg) {
   if (camera_model_computed) {
     return;
   }
+  // aruco_fractal
+  cam_param = rosCameraInfo2ArucoCamParams(*msg, useRectifiedParameters);
   camera_model.fromCameraInfo(msg);
   camera_model.distortionCoeffs().copyTo(distortion_coefficients);
   intrinsic_matrix = camera_model.intrinsicMatrix();
@@ -128,6 +194,12 @@ void callback(const ImageConstPtr &image_msg) {
     return;
   }
 
+  // pose estimation
+  if (cam_param.isValid()) {
+    FDetector.setParams(cam_param, marker_size);
+    // ROS_INFO("Set cam_param !");
+  }
+
   string frame_id = image_msg->header.frame_id;
   auto image = cv_bridge::toCvShare(image_msg)->image;
   cv::Mat display_image(image);
@@ -139,11 +211,10 @@ void callback(const ImageConstPtr &image_msg) {
     GaussianBlur(image, image, Size(blur_window_size, blur_window_size), 0, 0);
   }
 
-  // yujie0325
   bool fractal_detected = FDetector.detect(image);
 
   double delta = (double)(cv::getTickCount() - ticks) / cv::getTickFrequency();
-  cout << "checking aruco: " << delta << " "
+  cout << "checking fractal marker: " << delta << " "
        << " fps: " << 1 / delta << endl;
 
   // fractal_detected
@@ -152,18 +223,34 @@ void callback(const ImageConstPtr &image_msg) {
   if (fractal_detected) {
     ROS_INFO("Detected fractal marker!");
 
+    if (FDetector.poseEstimation()) {
+      // Calc distance to marker
+      cv::Mat tvec = FDetector.getTvec();
+      double Z =
+          sqrt(pow(tvec.at<double>(0, 0), 2) + pow(tvec.at<double>(1, 0), 2) +
+               pow(tvec.at<double>(2, 0), 2));
+      std::cout << "Distance to fractal marker: " << Z << " meters. "
+                << std::endl;
+    }
+
     // Draw marker poses
     if (show_detections) {
       // aruco::drawDetectedMarkers(display_image, corners, ids);
       FDetector.drawMarkers(display_image);
       // Draw inners corners and show fractal marker
-      FDetector.draw2d(display_image);
     }
     if (result_img_pub_.getNumSubscribers() > 0) {
       // yujie0325
       if (display_image.channels() == 3) {
         cv::putText(display_image, "Fractal found", cv::Point(10, 30),
                     cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(0, 255, 255), 3);
+        if (FDetector.poseEstimation()) {
+          FDetector.draw3d(display_image);
+          // FDetector.drawAxis(display_image, show_axis);
+          // FDetector.drawCube(display_image, show_cube);
+        } else {
+          FDetector.draw2d(display_image); // show at least the inner corners!
+        }
         result_img_pub_.publish(
             cv_bridge::CvImage(std_msgs::Header(), "rgb8", display_image)
                 .toImageMsg());
@@ -172,6 +259,13 @@ void callback(const ImageConstPtr &image_msg) {
         cv::cvtColor(display_image, color_display_image, cv::COLOR_GRAY2RGB);
         cv::putText(color_display_image, "Fractal found", cv::Point(10, 30),
                     cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(0, 255, 255), 3);
+        if (FDetector.poseEstimation()) {
+          FDetector.draw3d(color_display_image);
+          // FDetector.drawAxis(display_image, show_axis);
+          // FDetector.drawCube(display_image, show_cube);
+        } else {
+          FDetector.draw2d(color_display_image);
+        }
         result_img_pub_.publish(
             cv_bridge::CvImage(std_msgs::Header(), "rgb8", color_display_image)
                 .toImageMsg());
@@ -234,6 +328,8 @@ int main(int argc, char **argv) {
   nh.param("camera_info", rgb_info_topic,
            string("/mynteye/left_rect/camera_info"));
   nh.param("show_detections", show_detections, true);
+  nh.param("show_cube", show_detections, true);
+  nh.param("show_axis", show_detections, true);
   nh.param("tf_prefix", marker_tf_prefix, string("marker"));
   nh.param("marker_size", marker_size, 0.2f);
   nh.param("enable_blur", enable_blur, false);
@@ -247,16 +343,16 @@ int main(int argc, char **argv) {
   nh.param("marker_name", marker_name, string("FRACTAL_5L_6"));
   int queue_size = 10;
 
-  // Configure fractal marker detector
-  FDetector.setConfiguration(marker_name);
-  ROS_DEBUG("%f", marker_size);
-
-  if (show_detections) {
-  }
   ros::Subscriber rgb_sub =
       nh.subscribe(rgb_topic.c_str(), queue_size, callback);
   ros::Subscriber c =
       nh.subscribe(rgb_info_topic.c_str(), queue_size, callback_camera_info);
+
+
+  // Configure fractal marker detector
+  FDetector.setConfiguration(marker_name);
+  // ROS_DEBUG("%f", marker_size);
+  ROS_INFO("Marker size: %f", marker_size);
 
   // Publisher:
   image_transport::ImageTransport it(nh);

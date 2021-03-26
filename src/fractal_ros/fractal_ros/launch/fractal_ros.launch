@@ -12,7 +12,9 @@
   <arg name="camera" default="/cv_camera/image_raw" />
   <arg name="camera_info" default="/cv_camera/camera_info" />
   <arg name="tf_prefix" default="marker_id" />
-  <arg name="show_detections" default="true" />
+  <arg name="show_detections" default="false" />
+  <arg name="show_axis" default="true" /> <!-- must be true -->
+  <arg name="show_cube" default="true" />
   <arg name="marker_size" default="0.2" doc="length of the physical marker's side in meters" />
   <!-- FRACTAL_5L_6 | FRACTAL_4L_6 | FRACTAL_3L_6 | FRACTAL_2L_6 -->
   <arg name="marker_name" default="FRACTAL_4L_6" />
@@ -30,6 +32,8 @@
     <param name="camera_info" type="string" value="$(arg camera_info)"/>
     <param name="tf_prefix" type="string" value="$(arg tf_prefix)"/>
     <param name="show_detections" type="bool" value="$(arg show_detections)"/>
+    <param name="show_axis" type="bool" value="$(arg show_axis)" />
+    <param name="show_cube" type="bool" value="$(arg show_cube)" />
     <param name="marker_size" type="double" value="$(arg marker_size)"/>
     <param name="marker_name" type="string" value="$(arg marker_name)" />
     <param name="image_width" type="double" value="$(arg image_width)"/>
@@ -39,10 +43,12 @@
     <param name="min_prec_value" type="double" value="$(arg min_prec_value)"/>
   </node>
 
-  <group if="$(arg input_debug)">
-    <node pkg="rqt_image_view" type="rqt_image_view" name="origin_img" args="/cv_camera/image_raw" />
-  </group>
-  <group if="$(arg output_debug)">
-    <node pkg="rqt_image_view" type="rqt_image_view" name="result_img" args="/result_img" />
+  <group if="$(arg show_detections)">
+    <group if="$(arg input_debug)">
+      <node pkg="rqt_image_view" type="rqt_image_view" name="origin_img" args="/cv_camera/image_raw" />
+    </group>
+    <group if="$(arg output_debug)">
+      <node pkg="rqt_image_view" type="rqt_image_view" name="result_img" args="/result_img" />
+    </group>
   </group>
 </launch>

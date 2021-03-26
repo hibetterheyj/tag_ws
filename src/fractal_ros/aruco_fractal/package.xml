@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>aruco_fractal</name>
-  <version>2.1.1</version>
+  <version>0.0.1</version>
   <description>
     utitlize the latest aruco 3.1.12 to build separate fractal library for fractal_ros
   </description>

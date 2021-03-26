@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>fractal_msg</name>
-  <version>2.1.1</version>
+  <version>0.0.1</version>
   <description>The fractal_msg package</description>
   <maintainer email="he-yujie@outlook.com">Yujie He</maintainer>
   <url type="website">http://yujie-he.github.io/</url>

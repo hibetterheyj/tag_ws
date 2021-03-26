@@ -6,18 +6,22 @@
 
 - [x] preliminary whycon implementation(21.3.10)
 - [x] preliminary aruco implementation (21.3.10)
-- [ ] preliminary fractal implementation
-  - [ ] build a minimal library for aruco and fractal
-- [ ] time analysis
+- [x preliminary fractal implementation with ROS implementation (21.3.25)
+  - [x] build a minimal library for aruco and fractal
+- [x] time analysis
   - [x] preliminary test (21.3.11)
   - [ ] using gprof mentioned in [Zhihu](https://www.zhihu.com/question/265131281)
+  - [ ] update all time performance on JestonNano (21.3.26)
 - [ ] add badge using https://shields.io/
   clang, ros-melodic, opencv-3.2/3.4, aruco-3.1.12
+  3.4.5
 - [ ] add resources
   - [x] calibration and tag files (21.3.13)
   - [x] update preliminary rosbags (21.3.11)
   - [ ] update videos and camera parameter files in drone scenarios
 - [ ] add CI/CD
+- [ ] update OpenCV3.4.5 compilation procedure
+- [x] update MyntEye SDK repo for jestonNano: https://github.com/hibetterheyj/MYNT-EYE-S-SDK/tree/jeston (21.3.25)
 
 ## Work with camera
 

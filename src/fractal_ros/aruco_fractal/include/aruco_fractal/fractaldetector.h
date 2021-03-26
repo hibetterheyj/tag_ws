@@ -83,7 +83,10 @@ namespace aruco {
         void draw2d(cv::Mat &img);
 
         // draw pose estimation axes
-        void draw3d(cv::Mat &img, bool cube=true, bool axis=true);
+        void draw3d(cv::Mat &img, bool cube = false, bool axis = false);
+        // yujie0324 draw pose estimation axis only without cube
+        void drawAxis(cv::Mat &img, bool axis = false);
+        void drawCube(cv::Mat &img, bool cube = false);
 
         // draw marker as cube
         void draw3dCube(cv::Mat& Image, FractalMarker m, const CameraParameters& CP, int lineSize);

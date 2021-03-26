@@ -107,6 +107,77 @@ namespace aruco
         }
     }
 
+    // yujie0324
+    void FractalDetector::drawAxis(cv::Mat &img, bool axis) {
+      if (Tracker.isPoseValid()) {
+        cv::Mat rot;
+        cv::Rodrigues(Tracker.getRvec(), rot);
+
+        std::vector<cv::Point3f> innerPoints3d;
+        for (auto pt : Tracker.getInner3d()) {
+          cv::Mat_<double> src(3, 1, rot.type());
+          src(0, 0) = pt.x;
+          src(1, 0) = pt.y;
+          src(2, 0) = pt.z;
+
+          cv::Mat cam_image_point = rot * src + Tracker.getTvec();
+          cam_image_point = cam_image_point / cv::norm(cam_image_point);
+
+          if (cam_image_point.at<double>(2, 0) > 0.85)
+            innerPoints3d.push_back(pt);
+        }
+        // Draw inner points
+        if (innerPoints3d.size() > 0) {
+          std::vector<cv::Point2f> innerPoints;
+          projectPoints(innerPoints3d, Tracker.getRvec(), Tracker.getTvec(),
+                        _cam_params.CameraMatrix, _cam_params.Distorsion,
+                        innerPoints);
+          for (auto p : innerPoints)
+            circle(img, p, 3, cv::Scalar(0, 0, 255), CV_FILLED);
+        }
+        // Draw axes
+        if (axis)
+          CvDrawingUtils::draw3dAxis(img, _cam_params, getRvec(), getTvec(),
+                                     Tracker.getFractal().getFractalSize() / 2);
+      }
+    }
+    void FractalDetector::drawCube(cv::Mat &img, bool cube) {
+      if (Tracker.isPoseValid()) {
+        cv::Mat rot;
+        cv::Rodrigues(Tracker.getRvec(), rot);
+
+        std::vector<cv::Point3f> innerPoints3d;
+        for (auto pt : Tracker.getInner3d()) {
+          cv::Mat_<double> src(3, 1, rot.type());
+          src(0, 0) = pt.x;
+          src(1, 0) = pt.y;
+          src(2, 0) = pt.z;
+
+          cv::Mat cam_image_point = rot * src + Tracker.getTvec();
+          cam_image_point = cam_image_point / cv::norm(cam_image_point);
+
+          if (cam_image_point.at<double>(2, 0) > 0.85)
+            innerPoints3d.push_back(pt);
+        }
+        // Draw inner points
+        if (innerPoints3d.size() > 0) {
+          std::vector<cv::Point2f> innerPoints;
+          projectPoints(innerPoints3d, Tracker.getRvec(), Tracker.getTvec(),
+                        _cam_params.CameraMatrix, _cam_params.Distorsion,
+                        innerPoints);
+          for (auto p : innerPoints)
+            circle(img, p, 3, cv::Scalar(0, 0, 255), CV_FILLED);
+        }
+        // Draw cube
+        if (cube) {
+          std::map<int, FractalMarker> id_fmarker =
+              Tracker.getFractal().fractalMarkerCollection;
+          for (auto m : Markers)
+            draw3dCube(img, id_fmarker[m.id], _cam_params, 2);
+        }
+      }
+    }
+
     void FractalDetector::draw3dCube(cv::Mat& Image, FractalMarker m, const CameraParameters& CP, int lineSize)
     {
         cv::Mat objectPoints(8, 3, CV_32FC1);
