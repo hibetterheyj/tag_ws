@@ -51,7 +51,7 @@ include_directories(
         ${OpenCV_INCLUDE_DIRS}
 )
 
-add_executable(${PROJECT_NAME}_node src/fractal_ros.cpp)
+add_executable(${PROJECT_NAME}_node src/fractal_ros_simple.cpp)
 target_link_libraries(${PROJECT_NAME}_node
         ${catkin_LIBRARIES}
          ${OpenCV_LIBRARIES}

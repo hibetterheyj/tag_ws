@@ -1,0 +1,46 @@
+<launch>
+  <!-- ARG -->
+  <arg name="use_rviz" default="False" />
+  <arg name="use_rqt_image_view" default="True" />
+  <arg name="use_rosbag" default="False" />
+  <arg name="base_path" default="$(find aruco_yujie)/bags/" />
+  <arg name="bag_name" default="example_aruco_whycon_13-53-03" />
+
+  <arg name="image_width" default="752" /> <!-- 752 -->
+  <arg name="image_height" default="480" /> <!-- 480 -->
+  <arg name="camera" default="/mynteye/left_rect/image_rect" />
+  <arg name="camera_info" default="/mynteye/left_rect/camera_info" />
+  <arg name="tf_prefix" default="marker_id" />
+  <arg name="show_detections" default="true" />
+  <arg name="marker_size" default="0.2" doc="length of the physical marker's side in meters" />
+  <arg name="marker_name" default="FRACTAL_5L_6" />
+  <arg name="blur_window_size" default="7" />
+  <arg name="num_detected" default="1" /><!-- 0: do not use it, -->
+  <arg name="min_prec_value" default="50" /><!-- 0: do not use it, 80 means aruco marker must be detected in 80% of the last pics to be displayed -->
+  <arg name="lr" default="left"/>
+
+  <!-- NODE -->
+  <group if="$(arg use_rosbag)">
+    <node pkg="rosbag" type="play" name="player" output="screen" args="-r 0.8 -l $(arg base_path)$(arg bag_name).bag" />
+  </group>
+  <node pkg="fractal_ros" type="node" name="fractal_ros" output="screen">
+    <param name="camera" type="string" value="$(arg camera)"/>
+    <param name="camera_info" type="string" value="$(arg camera_info)"/>
+    <param name="tf_prefix" type="string" value="$(arg tf_prefix)"/>
+    <param name="show_detections" type="bool" value="$(arg show_detections)"/>
+    <param name="marker_size" type="double" value="$(arg marker_size)"/>
+    <param name="marker_name" type="string" value="$(arg marker_name)" />
+    <param name="image_width" type="double" value="$(arg image_width)"/>
+    <param name="image_height" type="double" value="$(arg image_height)"/>
+    <param name="blur_window_size" type="double" value="$(arg blur_window_size)"/>
+    <param name="num_detected" type="double" value="$(arg num_detected)"/>
+    <param name="min_prec_value" type="double" value="$(arg min_prec_value)"/>
+  </node>
+
+  <group if="$(arg use_rqt_image_view)">
+    <node pkg="rqt_image_view" type="rqt_image_view" name="origin_img" args="/cv_camera/image_raw" />
+  </group>
+  <group if="$(arg use_rqt_image_view)">
+    <node pkg="rqt_image_view" type="rqt_image_view" name="result_img" args="/result_img" />
+  </group>
+</launch>

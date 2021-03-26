@@ -3,7 +3,7 @@
 #include "../cameraparameters.h"
 #include "../markerdetector.h"
 #include "fractalmarkerset.h"
-#include "aruco_export.h"
+#include "../aruco_export.h"
 namespace aruco {
     struct PicoFlann_KeyPointAdapter{
         inline  float operator( )(const cv::KeyPoint &elem, int dim)const { return dim==0?elem.pt.x:elem.pt.y; }
