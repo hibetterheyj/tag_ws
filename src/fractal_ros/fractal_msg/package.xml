@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>fractal_msg</name>
+  <version>0.0.1</version>
+  <description>The fractal_msg package</description>
+  <maintainer email="he-yujie@outlook.com">Yujie He</maintainer>
+  <url type="website">http://yujie-he.github.io/</url>
+  <author email="yujie.he@epfl.ch">Yujie He</author>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
+
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+
+</package>

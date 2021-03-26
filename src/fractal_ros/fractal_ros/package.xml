@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>fractal_ros</name>
+    <version>0.0.1</version>
+    <description>The fractal_ros package.</description>
+
+    <maintainer email="he-yujie@outlook.com">Yujie He</maintainer>
+    <url type="website">http://yujie-he.github.io/</url>
+    <author email="yujie.he@epfl.ch">Yujie He</author>
+    <license>BSD</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+    <build_depend>cv_bridge</build_depend>
+    <build_depend>geometry_msgs</build_depend>
+    <build_depend>image_geometry</build_depend>
+    <build_depend>roscpp</build_depend>
+    <build_depend>rospy</build_depend>
+    <build_depend>std_msgs</build_depend>
+    <build_depend>tf2_ros</build_depend>
+    <build_depend>tf2</build_depend>
+    <build_depend>image_transport</build_depend>
+    <build_depend>aruco_fractal</build_depend>
+    <build_depend>fractal_msg</build_depend>
+
+    <exec_depend>std_msgs</exec_depend>
+    <exec_depend>cv_bridge</exec_depend>
+    <exec_depend>image_transport</exec_depend>
+    <exec_depend>geometry_msgs</exec_depend>
+    <exec_depend>image_geometry</exec_depend>
+    <exec_depend>roscpp</exec_depend>
+    <exec_depend>rospy</exec_depend>
+    <exec_depend>tf2_ros</exec_depend>
+    <exec_depend>tf2</exec_depend>
+    <exec_depend>aruco_fractal</exec_depend>
+    <exec_depend>fractal_msg</exec_depend>
+</package>

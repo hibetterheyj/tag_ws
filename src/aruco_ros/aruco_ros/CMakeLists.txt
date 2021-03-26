@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(aruco_ros)
+set(OpenCV_DIR "/home/lis/opencv-3.4.5/build/installed/share/OpenCV")
 
 find_package(OpenCV REQUIRED)
 

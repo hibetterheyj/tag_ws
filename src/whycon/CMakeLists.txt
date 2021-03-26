@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(whycon)
+set(OpenCV_DIR "/home/lis/opencv-3.4.5/build/installed/share/OpenCV")
 
 # set some flags
 add_definitions(-std=c++11)

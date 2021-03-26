@@ -1,3 +1,13 @@
+# jeston ver.
+
+```
+set(OpenCV_DIR "/home/lis/opencv-3.4.5/build/installed/share/OpenCV")
+# only install ROS desktop version
+sudo apt install ros-melodic-camera-info-manager
+```
+
+
+---
 # Marker detection
 
 ⭐ some huge files can be found [here](https://drive.google.com/drive/folders/1qwV2kRVkfSNCs9ddREWbypiysS995Kv9?usp=sharing)
