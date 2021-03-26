@@ -130,6 +130,8 @@ int main(int argc, char **argv) {
     int frame_num = 0;
     int detected_num = 0;
     double overall_time = 0.0;
+    bool cube(false);
+    bool axis = true;
 
     do {
       vreader.retrieve(InImage);
@@ -155,6 +157,7 @@ int main(int argc, char **argv) {
 
       // Draw inners corners and show fractal marker
       FDetector.draw2d(InImage);
+      // FDetector.draw3d(InImage, cube, axis);
       cv::imshow("Fractal", InImage);
 
       // Draw landingPad (at least one marker is detected)

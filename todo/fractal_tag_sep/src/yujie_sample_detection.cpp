@@ -13,9 +13,11 @@ int main(int argc, char **argv) {
   } else {
     std::cout << "Not founded!" << std::endl;
   }
-  FDetector.draw2d(im); // Show me the inner corners!
-
-  // cv::imshow("image", im);
-  // cv::waitKey(0);
+  // Show me the inner corners !
+      FDetector.draw2d(im);
+      // FDetector.draw3d(im, true, true);
+      // autoresize
+      cv::imshow("image", im);
+  cv::waitKey(0);
   return 0;
 }

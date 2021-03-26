@@ -13,6 +13,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11  -pthread")
 find_package(OpenCV REQUIRED)
 # add aruco locally
 find_package(Eigen3 REQUIRED)
+SET(THREADLIB "pthread")
 
 #搜索ArUco依赖库
 # find_package(aruco REQUIRED)
@@ -55,15 +56,18 @@ add_executable(sample_detection src/sample_detection.cpp)
 add_executable(sample_landing src/sample_landing.cpp)
 add_executable(yujie_sample_detection src/yujie_sample_detection.cpp)
 add_executable(yujie_sample_landing src/yujie_sample_landing.cpp)
+add_executable(fractal_tracker src/fractal_tracker.cpp)
 
 set(DEP_LIBS ${DEP_LIBS} ${OpenCV_LIBS})
 #set(DEP_LIBS ${DEP_LIBS} ${aruco_LIBS})
 set(DEP_LIBS ${DEP_LIBS} aruco_fractal)
+set(DEP_LIBS ${DEP_LIBS} ${THREADLIB})
 
 target_link_libraries(sample_detection ${DEP_LIBS})
 target_link_libraries(sample_landing ${DEP_LIBS})
 target_link_libraries(yujie_sample_detection ${DEP_LIBS})
 target_link_libraries(yujie_sample_landing ${DEP_LIBS})
+target_link_libraries(fractal_tracker ${DEP_LIBS})
 
 # #生成文件链接至OpenCV库，注意OpenCV_LIBS变量需在OpenCVConfig.cmake文件中定义，下同
 # target_link_libraries(ArUco_Test ${OpenCV_LIBS})
