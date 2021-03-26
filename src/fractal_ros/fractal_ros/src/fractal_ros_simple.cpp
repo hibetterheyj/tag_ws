@@ -162,12 +162,18 @@ void callback(const ImageConstPtr &image_msg) {
     if (result_img_pub_.getNumSubscribers() > 0) {
       // yujie0325
       if (display_image.channels() == 3) {
+        cv::putText(display_image, "Fractal found", cv::Point(10, 30),
+                    cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(0, 255, 255), 3);
         result_img_pub_.publish(
             cv_bridge::CvImage(std_msgs::Header(), "rgb8", display_image)
                 .toImageMsg());
       } else if (display_image.channels() == 1) {
+        cv::Mat color_display_image;
+        cv::cvtColor(display_image, color_display_image, cv::COLOR_GRAY2RGB);
+        cv::putText(color_display_image, "Fractal found", cv::Point(10, 30),
+                    cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(0, 255, 255), 3);
         result_img_pub_.publish(
-            cv_bridge::CvImage(std_msgs::Header(), "mono8", display_image)
+            cv_bridge::CvImage(std_msgs::Header(), "rgb8", color_display_image)
                 .toImageMsg());
       } else {
         ROS_ERROR("Unsupported channel number");
@@ -184,16 +190,22 @@ void callback(const ImageConstPtr &image_msg) {
     // if no markers are detected
     ROS_INFO("Markers not found");
     if (show_detections) {
-      // imshow("markers", display_image);
       if (result_img_pub_.getNumSubscribers() > 0) {
         if (display_image.channels() == 3) {
+          cv::putText(display_image, "Not found", cv::Point(10, 30),
+                      cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(255, 0, 0), 3);
           result_img_pub_.publish(
               cv_bridge::CvImage(std_msgs::Header(), "rgb8", display_image)
                   .toImageMsg());
         } else if (display_image.channels() == 1) {
+          cv::Mat color_display_image;
+          cv::cvtColor(display_image, color_display_image, cv::COLOR_GRAY2RGB);
+          cv::putText(color_display_image, "Not found", cv::Point(10, 30),
+                      cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(255, 0, 0), 3);
           result_img_pub_.publish(
               // https://docs.ros.org/en/diamondback/api/cv_bridge/html/c++/cv__bridge_8cpp_source.html
-              cv_bridge::CvImage(std_msgs::Header(), "mono8", display_image)
+              cv_bridge::CvImage(std_msgs::Header(), "rgb8",
+                                 color_display_image)
                   .toImageMsg());
         } else {
           ROS_ERROR("Unsupported channel number");

@@ -15,7 +15,7 @@
   <arg name="show_detections" default="true" />
   <arg name="marker_size" default="0.2" doc="length of the physical marker's side in meters" />
   <!-- FRACTAL_5L_6 | FRACTAL_4L_6 | FRACTAL_3L_6 | FRACTAL_2L_6 -->
-  <arg name="marker_name" default="FRACTAL_3L_6" />
+  <arg name="marker_name" default="FRACTAL_4L_6" />
   <arg name="blur_window_size" default="7" />
   <arg name="num_detected" default="1" /><!-- 0: do not use it, -->
   <arg name="min_prec_value" default="50" /><!-- 0: do not use it, 80 means aruco marker must be detected in 80% of the last pics to be displayed -->
