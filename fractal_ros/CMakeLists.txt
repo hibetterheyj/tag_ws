@@ -55,23 +55,23 @@ include_directories(
 # Library #
 ###########
 
-# add_library(${PROJECT_NAME}_library
-#         src/FractalROS.cpp
-# }
+add_library(${PROJECT_NAME}_library
+        src/FractalROS.cpp
+}
 
-# target_link_libraries(${PROJECT_NAME}_library
-#         ${catkin_LIBRARIES}
-#         ${OpenCV_LIBRARIES}
-# )
+target_link_libraries(${PROJECT_NAME}_library
+        ${catkin_LIBRARIES}
+        ${OpenCV_LIBRARIES}
+)
 
 ##############
 # Executable #
 ##############
 
-# add_executable(${PROJECT_NAME}_ros_node src/fractal_node.cpp)
-# target_link_libraries(${PROJECT_NAME}_ros_node
-#         ${PROJECT_NAME}_library
-# )
+add_executable(${PROJECT_NAME}_ros_node src/fractal_node.cpp)
+target_link_libraries(${PROJECT_NAME}_ros_node
+        ${PROJECT_NAME}_library
+)
 
 add_executable(${PROJECT_NAME}_node src/fractal_ros_simple.cpp)
 target_link_libraries(${PROJECT_NAME}_node
