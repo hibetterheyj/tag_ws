@@ -4,11 +4,13 @@
   <arg name="input_debug" default="False" />
   <arg name="output_debug" default="True" />
   <arg name="use_rosbag" default="False" />
-  <arg name="base_path" default="$(find aruco_yujie)/bags/" />
-  <arg name="bag_name" default="example_aruco_whycon_13-53-03" />
+  <arg name="base_path" default="$(find fractal_ros)/bags/" />
+  <arg name="bag_name" default="fractal4_2021-03-26-10-00-56" />
 
-  <arg name="image_width" default="640" /> 
+  <arg name="image_width" default="752" /> 
   <arg name="image_height" default="480" />
+  <!-- <arg name="camera" default="/mynteye/left_rect/image_rect" />
+  <arg name="camera_info" default="/mynteye/left_rect/camera_info" /> -->
   <arg name="camera" default="/cv_camera/image_raw" />
   <arg name="camera_info" default="/cv_camera/camera_info" />
   <arg name="tf_prefix" default="marker_id" />
@@ -18,7 +20,7 @@
   <arg name="marker_size" default="0.2" doc="length of the physical marker's side in meters" />
   <!-- FRACTAL_5L_6 | FRACTAL_4L_6 | FRACTAL_3L_6 | FRACTAL_2L_6 -->
   <!-- FRACTAL_4L_6 not that robust-->
-  <arg name="marker_name" default="FRACTAL_3L_6" />
+  <arg name="marker_name" default="FRACTAL_4L_6" />
   <arg name="blur_window_size" default="7" />
   <arg name="lr" default="left"/>
 
@@ -42,7 +44,7 @@
 
   <group if="$(arg show_detections)">
     <group if="$(arg input_debug)">
-      <node pkg="rqt_image_view" type="rqt_image_view" name="origin_img" args="/cv_camera/image_raw" />
+      <node pkg="rqt_image_view" type="rqt_image_view" name="origin_img" args="/mynteye/left_rect/image_rect" />
     </group>
     <group if="$(arg output_debug)">
       <node pkg="rqt_image_view" type="rqt_image_view" name="result_img" args="/result_img" />

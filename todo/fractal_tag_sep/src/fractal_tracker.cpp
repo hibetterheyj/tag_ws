@@ -93,6 +93,7 @@ int main(int argc, char** argv)
         {
             std::cout << "\r\rFrameId: " << frameId++<<std::endl;
             vreader.retrieve(InImage);
+            std::cout << "test";
 
             // Ok, let's detect
             Tdetect.start();
@@ -111,6 +112,9 @@ int main(int argc, char** argv)
 
                 //Calc distance to marker
                 cv::Mat tvec = FDetector.getTvec();
+                // cout << tvec;
+                //cv::Mat rvec = FDetector.getRvec();
+                // cout << rvec;
                 double Z = sqrt(pow(tvec.at<double>(0,0),2) + pow(tvec.at<double>(1,0), 2) +
                          pow(tvec.at<double>(2,0),2));
                 std::cout << "Distance to fractal marker: " << Z << " meters. "<<  std::endl;

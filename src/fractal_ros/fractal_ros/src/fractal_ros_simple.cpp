@@ -12,11 +12,15 @@
 #include "sensor_msgs/Image.h"
 #include "std_msgs/Empty.h"
 #include "std_msgs/Int16.h"
+#include <fractal_msg/DistStamped.h>
+#include <fractal_msg/PoseStamped.h>
+#include <geometry_msgs/PoseArray.h>
 
 // ROS image geometry
 #include <image_geometry/pinhole_camera_model.h>
 
 // ROS transform
+#include <tf/tf.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Transform.h>
 #include <tf2/LinearMath/Vector3.h>
@@ -55,6 +59,11 @@ using namespace aruco;
 image_transport::Publisher result_img_pub_;
 ros::Publisher fractal_info_pub_;
 FractalDetector FDetector;
+// 0407 update distance info
+ros::Publisher MarkerDistPub;
+ros::Publisher MarkerPosePub;
+ros::Publisher MarkerPoseArrayPub;
+geometry_msgs::PoseArray pose_array;
 // pose estimation
 aruco::CameraParameters cam_param;
 bool useRectifiedParameters = false;
@@ -120,20 +129,20 @@ aruco::CameraParameters
 rosCameraInfo2ArucoCamParams(const sensor_msgs::CameraInfo &cam_info,
                              bool useRectifiedParameters) {
   // height: 480
-// width: 640
-// distortion_model: "plumb_bob"
-// D: [-0.1716817860764946, -0.01225296373676225, 0.0003033307663812846, 0.002673568383939145, 0.0]
-// K: [687.8497246312774, 0.0, 300.7999356548882, 0.0, 691.6978616578762, 305.4399788765402, 0.0, 0.0, 1.0]
-// R: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
-// P: [659.5717163085938, 0.0, 300.3917352603476, 0.0, 0.0, 672.5150756835938, 308.3962226994754, 0.0, 0.0, 0.0, 1.0, 0.0]
-// binning_x: 0
-// binning_y: 0
-// roi:
-//   x_offset: 0
-//   y_offset: 0
-//   height: 0
-//   width: 0
-//   do_rectify: False
+  // width: 640
+  // distortion_model: "plumb_bob"
+  // D: [-0.1716817860764946, -0.01225296373676225, 0.0003033307663812846, 0.002673568383939145, 0.0]
+  // K: [687.8497246312774, 0.0, 300.7999356548882, 0.0, 691.6978616578762, 305.4399788765402, 0.0, 0.0, 1.0]
+  // R: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+  // P: [659.5717163085938, 0.0, 300.3917352603476, 0.0, 0.0, 672.5150756835938, 308.3962226994754, 0.0, 0.0, 0.0, 1.0, 0.0]
+  // binning_x: 0
+  // binning_y: 0
+  // roi:
+  //   x_offset: 0
+  //   y_offset: 0
+  //   height: 0
+  //   width: 0
+  //   do_rectify: False
   cv::Mat cameraMatrix(3, 3, CV_64FC1);
   cv::Mat distorsionCoeff(4, 1, CV_64FC1);
   cv::Size size(cam_info.width, cam_info.height);
@@ -173,6 +182,37 @@ rosCameraInfo2ArucoCamParams(const sensor_msgs::CameraInfo &cam_info,
   }
 
   return aruco::CameraParameters(cameraMatrix, distorsionCoeff, size);
+}
+
+double _angle_to_pipi(double angle) {
+  while (true) {
+    if (angle < -M_PI) {
+      angle += 2. * M_PI;
+    }
+    if (angle > M_PI) {
+      angle -= 2. * M_PI;
+    }
+    if (abs(angle) <= M_PI) {
+      break;
+    }
+  }
+  return angle;
+}
+
+cv::Vec3d rot2euler(cv::Mat &rot) {
+  double sy = sqrt(rot.at<double>(0, 0) * rot.at<double>(0, 0) +
+                   rot.at<double>(1, 0) * rot.at<double>(1, 0));
+  double x, y, z;
+  if (sy >= 1e-6) {
+    x = atan2(rot.at<double>(2, 1), rot.at<double>(2, 2));
+    y = atan2(-rot.at<double>(2, 0), sy);
+    z = atan2(rot.at<double>(1, 0), rot.at<double>(0, 0));
+  } else {
+    x = atan2(-rot.at<double>(1, 2), rot.at<double>(1, 1));
+    y = atan2(-rot.at<double>(2, 0), sy);
+    z = 0;
+  }
+  return cv::Vec3d(x, y, z);
 }
 
 void callback_camera_info(const CameraInfoConstPtr &msg) {
@@ -217,20 +257,46 @@ void callback(const ImageConstPtr &image_msg) {
   cout << "checking fractal marker: " << delta << " "
        << " fps: " << 1 / delta << endl;
 
-  // fractal_detected
-  // TODO: compute pose!
-  // not implemented in original exmaple code
   if (fractal_detected) {
     ROS_INFO("Detected fractal marker!");
 
     if (FDetector.poseEstimation()) {
       // Calc distance to marker
       cv::Mat tvec = FDetector.getTvec();
-      double Z =
+      cv::Mat rvec = FDetector.getRvec();
+      cv::Mat rot;
+      cv::Rodrigues(rvec, rot);
+      cv::Vec3d rpy = rot2euler(rot);
+      rpy[2] = -_angle_to_pipi(rpy[2] - M_PI / 2);
+      double dist =
           sqrt(pow(tvec.at<double>(0, 0), 2) + pow(tvec.at<double>(1, 0), 2) +
                pow(tvec.at<double>(2, 0), 2));
-      std::cout << "Distance to fractal marker: " << Z << " meters. "
+      std::cout << "Distance to fractal marker: " << dist << " meters. "
                 << std::endl;
+      // 0407 update distance info
+      fractal_msg::DistStamped dist_stamped;
+      fractal_msg::PoseStamped pose_stamped;
+      dist_stamped.header.stamp = ros::Time::now();
+      pose_stamped.header.stamp = ros::Time::now();
+      dist_stamped.dist = dist;
+      pose_stamped.xyz.x = tvec.at<double>(0, 0);
+      pose_stamped.xyz.y = tvec.at<double>(1, 0);
+      pose_stamped.xyz.z = tvec.at<double>(2, 0);
+      pose_stamped.rpy.roll = rpy[0];
+      pose_stamped.rpy.pitch = rpy[1];
+      pose_stamped.rpy.yaw = rpy[2];
+      MarkerDistPub.publish(dist_stamped);
+      MarkerPosePub.publish(pose_stamped);
+      geometry_msgs::Pose pose;
+      pose.position.x = pose_stamped.xyz.x;
+      pose.position.y = pose_stamped.xyz.y;
+      pose.position.z = pose_stamped.xyz.z;
+      pose.orientation =
+          tf::createQuaternionMsgFromRollPitchYaw(rpy[0], rpy[1], rpy[2]);
+      pose_array.poses.push_back(pose);
+      pose_array.header.stamp = ros::Time::now();
+      pose_array.header.frame_id = "fractal";
+      MarkerPoseArrayPub.publish(pose_array);
     }
 
     // Draw marker poses
@@ -328,8 +394,8 @@ int main(int argc, char **argv) {
   nh.param("camera_info", rgb_info_topic,
            string("/mynteye/left_rect/camera_info"));
   nh.param("show_detections", show_detections, true);
-  nh.param("show_cube", show_detections, true);
-  nh.param("show_axis", show_detections, true);
+  nh.param("show_cube", show_cube, true);
+  nh.param("show_axis", show_axis, true);
   nh.param("tf_prefix", marker_tf_prefix, string("marker"));
   nh.param("marker_size", marker_size, 0.2f);
   nh.param("enable_blur", enable_blur, false);
@@ -357,6 +423,11 @@ int main(int argc, char **argv) {
   // Publisher:
   image_transport::ImageTransport it(nh);
   result_img_pub_ = it.advertise("/result_img", 1);
+  // 0407 update distance info
+  MarkerDistPub = nh.advertise<fractal_msg::DistStamped>("marker_dist", 1);
+  MarkerPosePub = nh.advertise<fractal_msg::PoseStamped>("marker_pose", 1);
+  MarkerPoseArrayPub =
+      nh.advertise<geometry_msgs::PoseArray>("marker_pose_array", 1);
 
   ros::spin();
   return 0;

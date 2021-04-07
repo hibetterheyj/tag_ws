@@ -13,6 +13,20 @@ FractalROS::FractalROS(ros::NodeHandle &nodeHandle) : nodeHandle_(nodeHandle) {
   /* initialize ROS */
   setupSubscribers();
   ROS_INFO("Successfully launched node.");
+
+  // Configure fractal marker detector
+  FDetector.setConfiguration(marker_name);
+  ROS_INFO("Marker size: %f", marker_size);
+
+  // Set camera parms for pose estimation
+  if (cam_param.isValid()) {
+    FDetector.setParams(cam_param, marker_size);
+    // ROS_INFO("Set cam_param !");
+  }
+
+  // Publisher:
+  image_transport::ImageTransport it;
+  result_img_pub_ = it.advertise("/result_img", 1);
 }
 
 FractalROS::~FractalROS()
@@ -54,12 +68,182 @@ void FractalROS::setupSubscribers() {
                             &FractalROS::cameraInfoCallback, this);
 }
 
+aruco::CameraParameters
+FractalROS::rosInfo2ArucoParams(const sensor_msgs::CameraInfo &cam_info,
+                                bool useRectifiedParameters) {
+  cv::Mat cameraMatrix(3, 3, CV_64FC1);
+  cv::Mat distorsionCoeff(4, 1, CV_64FC1);
+  cv::Size size(cam_info.width, cam_info.height);
+
+  if (useRectifiedParameters) {
+    cameraMatrix.setTo(0);
+    cameraMatrix.at<double>(0, 0) = cam_info.P[0];
+    cameraMatrix.at<double>(0, 1) = cam_info.P[1];
+    cameraMatrix.at<double>(0, 2) = cam_info.P[2];
+    cameraMatrix.at<double>(0, 3) = cam_info.P[3];
+    cameraMatrix.at<double>(1, 0) = cam_info.P[4];
+    cameraMatrix.at<double>(1, 1) = cam_info.P[5];
+    cameraMatrix.at<double>(1, 2) = cam_info.P[6];
+    cameraMatrix.at<double>(1, 3) = cam_info.P[7];
+    cameraMatrix.at<double>(2, 0) = cam_info.P[8];
+    cameraMatrix.at<double>(2, 1) = cam_info.P[9];
+    cameraMatrix.at<double>(2, 2) = cam_info.P[10];
+    cameraMatrix.at<double>(2, 3) = cam_info.P[11];
+
+    for (int i = 0; i < 4; ++i) {distorsionCoeff.at<double>(i, 0) = 0;}
+  } else {
+    for (int i = 0; i < 9; ++i)
+      cameraMatrix.at<double>(i % 3, i - (i % 3) * 3) = cam_info.K[i];
+
+    if (cam_info.D.size() == 4) {
+      for (int i = 0; i < 4; ++i)
+        distorsionCoeff.at<double>(i, 0) = cam_info.D[i];
+    } else {
+      // ROS_WARN("length of camera_info D vector is not 4, assuming zero distortion...");
+      ROS_WARN("length of camera_info D vector is not 4, set first 4 params");
+      for (int i = 0; i < 4; ++i)
+        // distorsionCoeff.at<double>(i, 0) = 0;
+        distorsionCoeff.at<double>(i, 0) = cam_info.D[i];
+    }
+  }
+
+  return aruco::CameraParameters(cameraMatrix, distorsionCoeff, size);
+}
+
 void FractalROS::imageCallback(const ImageConstPtr &image_msg) {
-  //
+  if (!camera_model_computed) {
+    ROS_INFO("camera model is not computed yet");
+    return;
+  }
+
+  // pose estimation
+  if (cam_param.isValid()) {
+    FDetector.setParams(cam_param, marker_size);
+    // ROS_INFO("Set cam_param !");
+  }
+
+  string frame_id = image_msg->header.frame_id;
+  auto image = cv_bridge::toCvShare(image_msg)->image;
+  cv::Mat display_image(image);
+
+  int64_t ticks = cv::getTickCount();
+
+  // Smooth the image to improve detection results
+  if (enable_blur) {
+    GaussianBlur(image, image, Size(blur_window_size, blur_window_size), 0, 0);
+  }
+
+  bool fractal_detected = FDetector.detect(image);
+
+  double delta = (double)(cv::getTickCount() - ticks) / cv::getTickFrequency();
+  cout << "checking fractal marker: " << delta << " "
+       << " fps: " << 1 / delta << endl;
+
+  if (fractal_detected) {
+    ROS_INFO("Detected fractal marker!");
+
+    if (FDetector.poseEstimation()) {
+      // Calc distance to marker
+      cv::Mat tvec = FDetector.getTvec();
+      double Z =
+          sqrt(pow(tvec.at<double>(0, 0), 2) + pow(tvec.at<double>(1, 0), 2) +
+               pow(tvec.at<double>(2, 0), 2));
+      std::cout << "Distance to fractal marker: " << Z << " meters. "
+                << std::endl;
+    }
+
+    // Draw marker poses
+    if (show_detections) {
+      // aruco::drawDetectedMarkers(display_image, corners, ids);
+      FDetector.drawMarkers(display_image);
+      // Draw inners corners and show fractal marker
+    }
+    if (result_img_pub_.getNumSubscribers() > 0) {
+      // yujie0325
+      if (display_image.channels() == 3) {
+        cv::putText(display_image, "Fractal found", cv::Point(10, 30),
+                    cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(0, 255, 255), 3);
+        if (FDetector.poseEstimation()) {
+          FDetector.draw3d(display_image);
+          // FDetector.drawAxis(display_image, show_axis);
+          // FDetector.drawCube(display_image, show_cube);
+        } else {
+          FDetector.draw2d(display_image); // show at least the inner corners!
+        }
+        result_img_pub_.publish(
+            cv_bridge::CvImage(std_msgs::Header(), "rgb8", display_image)
+                .toImageMsg());
+      } else if (display_image.channels() == 1) {
+        cv::Mat color_display_image;
+        cv::cvtColor(display_image, color_display_image, cv::COLOR_GRAY2RGB);
+        cv::putText(color_display_image, "Fractal found", cv::Point(10, 30),
+                    cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(0, 255, 255), 3);
+        if (FDetector.poseEstimation()) {
+          FDetector.draw3d(color_display_image);
+          // FDetector.drawAxis(display_image, show_axis);
+          // FDetector.drawCube(display_image, show_cube);
+        } else {
+          FDetector.draw2d(color_display_image);
+        }
+        result_img_pub_.publish(
+            cv_bridge::CvImage(std_msgs::Header(), "rgb8", color_display_image)
+                .toImageMsg());
+      } else {
+        ROS_ERROR("Unsupported channel number");
+      }
+    }
+    auto key = waitKey(1);
+    if (key == 27) {
+      ROS_INFO("ESC pressed, exit the program");
+      ros::shutdown();
+    }
+
+  } //  end if fractal_detected
+  else {
+    // if no markers are detected
+    ROS_INFO("Markers not found");
+    if (show_detections) {
+      if (result_img_pub_.getNumSubscribers() > 0) {
+        if (display_image.channels() == 3) {
+          cv::putText(display_image, "Not found", cv::Point(10, 30),
+                      cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(255, 0, 0), 3);
+          result_img_pub_.publish(
+              cv_bridge::CvImage(std_msgs::Header(), "rgb8", display_image)
+                  .toImageMsg());
+        } else if (display_image.channels() == 1) {
+          cv::Mat color_display_image;
+          cv::cvtColor(display_image, color_display_image, cv::COLOR_GRAY2RGB);
+          cv::putText(color_display_image, "Not found", cv::Point(10, 30),
+                      cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(255, 0, 0), 3);
+          result_img_pub_.publish(
+              // https://docs.ros.org/en/diamondback/api/cv_bridge/html/c++/cv__bridge_8cpp_source.html
+              cv_bridge::CvImage(std_msgs::Header(), "rgb8",
+                                 color_display_image)
+                  .toImageMsg());
+        } else {
+          ROS_ERROR("Unsupported channel number");
+        }
+      } // end of result_img_pub_.getNumSubscribers
+      auto key = waitKey(1);
+      if (key == 27) {
+        ROS_INFO("ESC pressed, exit the program");
+        ros::shutdown();
+      }
+    }
+  } // if no markers are detected
 }
 
 void FractalROS::cameraInfoCallback(const CameraInfoConstPtr &msg) {
-  //
+  if (camera_model_computed) {
+    return;
+  }
+  // aruco_fractal
+  cam_param = rosInfo2ArucoParams(*msg, useRectifiedParameters);
+  camera_model.fromCameraInfo(msg);
+  camera_model.distortionCoeffs().copyTo(distortion_coefficients);
+  intrinsic_matrix = camera_model.intrinsicMatrix();
+  camera_model_computed = true;
+  ROS_INFO("camera model is computed");
 }
 
   // bool FractalROS::serviceCallback(std_srvs::Trigger::Request & request,

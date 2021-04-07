@@ -12,4 +12,5 @@
 ```shell
 # new example for fractal
 ./build/fractal_tracker my_video.mkv -cam cameraParams.yml -c FRACTAL_4L_6 -s 0.2
+./fractal_tracker ../my_video.mkv -cam ../cameraParams.yml -c FRACTAL_4L_6 -s 0.2
 ```

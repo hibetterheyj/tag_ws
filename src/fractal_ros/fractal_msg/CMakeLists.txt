@@ -10,6 +10,9 @@ add_message_files(FILES
   #Marker.msg
   #MarkerArray.msg
   FractalInfo.msg
+  RPY.msg
+  PoseStamped.msg
+  DistStamped.msg
 )
 generate_messages(DEPENDENCIES std_msgs geometry_msgs )
 
