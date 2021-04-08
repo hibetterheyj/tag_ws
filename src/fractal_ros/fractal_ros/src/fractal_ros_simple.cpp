@@ -312,8 +312,8 @@ void callback(const ImageConstPtr &image_msg) {
                     cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(0, 255, 255), 3);
         if (FDetector.poseEstimation()) {
           FDetector.draw3d(display_image);
-          // FDetector.drawAxis(display_image, show_axis);
-          // FDetector.drawCube(display_image, show_cube);
+          FDetector.drawAxis(display_image, show_axis);
+          FDetector.drawCube(display_image, show_cube);
         } else {
           FDetector.draw2d(display_image); // show at least the inner corners!
         }
@@ -327,8 +327,8 @@ void callback(const ImageConstPtr &image_msg) {
                     cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(0, 255, 255), 3);
         if (FDetector.poseEstimation()) {
           FDetector.draw3d(color_display_image);
-          // FDetector.drawAxis(display_image, show_axis);
-          // FDetector.drawCube(display_image, show_cube);
+          FDetector.drawAxis(color_display_image, show_axis);
+          FDetector.drawCube(color_display_image, show_cube);
         } else {
           FDetector.draw2d(color_display_image);
         }

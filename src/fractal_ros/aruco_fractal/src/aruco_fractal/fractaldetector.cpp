@@ -138,7 +138,7 @@ namespace aruco
         // Draw axes
         if (axis)
           CvDrawingUtils::draw3dAxis(img, _cam_params, getRvec(), getTvec(),
-                                     Tracker.getFractal().getFractalSize() / 2);
+                                     Tracker.getFractal().getFractalSize() / 4);
       }
     }
     void FractalDetector::drawCube(cv::Mat &img, bool cube) {
