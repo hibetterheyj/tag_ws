@@ -20,6 +20,7 @@
   <arg name="level" default="3" />
   <arg name="marker_name" default="FRACTAL_$(arg level)L_6" />
   <arg name="blur_window_size" default="7" />
+  <arg name="fps_verbose" default="false" />
   <!-- <arg name="lr" default="left"/> -->
 
   <!-- NODE -->

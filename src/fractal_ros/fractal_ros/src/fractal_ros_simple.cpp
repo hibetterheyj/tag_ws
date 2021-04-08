@@ -69,6 +69,7 @@ bool useRectifiedParameters = false;
 
 // Define global variables
 bool camera_model_computed = false;
+bool camera_info_set = false;
 bool show_detections, show_cube, show_axis;
 float marker_size;
 string marker_tf_prefix;
@@ -76,10 +77,12 @@ int blur_window_size = 7;
 int image_fps = 30;
 int image_width = 640;
 int image_height = 480;
-bool enable_blur = true;
+bool enable_blur;
+bool fps_verbose;
+int64_t ticks_image_callback, ticks_checkout_marker, ticks_compute_pose;
 
 // hashmap used for uncertainty:
-int num_detected = 10;   // =0 -> not used
+int num_detected = 10; // =0 -> not used
 int min_prec_value = 80; // min precentage value to be a detected marker.
 
 void int_handler(int x) {
@@ -177,21 +180,28 @@ void camera_info_callback(const CameraInfoConstPtr &msg) {
 }
 
 void image_callback(const ImageConstPtr &image_msg) {
+  if (fps_verbose) {
+    ticks_image_callback = cv::getTickCount();
+  }
   if (!camera_model_computed) {
     ROS_INFO("camera model is not computed yet");
     return;
   }
 
-  // pose estimation
-  if (cam_param.isValid()) {
+  // set  parameters for pose estimation
+  if (cam_param.isValid() && camera_info_set == false) {
     FDetector.setParams(cam_param, marker_size);
+    camera_info_set = true;
+    ROS_INFO("set params for fractal");
   }
 
   string frame_id = image_msg->header.frame_id;
   auto image = cv_bridge::toCvShare(image_msg)->image;
   cv::Mat display_image(image);
 
-  int64_t ticks_checkout_marker = cv::getTickCount();
+  if (fps_verbose) {
+    ticks_checkout_marker = cv::getTickCount();
+  }
 
   // Smooth the image to improve detection results
   if (enable_blur) {
@@ -200,13 +210,15 @@ void image_callback(const ImageConstPtr &image_msg) {
 
   bool fractal_detected = FDetector.detect(image);
 
-  double delta_checkout_marker =
-      (double)(cv::getTickCount() - ticks_checkout_marker) /
-      cv::getTickFrequency();
-  cout << "checking fractal marker: " << delta_checkout_marker << " "
-       << " Hz: " << 1 / delta_checkout_marker << endl;
+  if (fps_verbose) {
+    double delta_checkout_marker =
+        (double)(cv::getTickCount() - ticks_checkout_marker) /
+        cv::getTickFrequency();
+    cout << "checking fractal marker: " << delta_checkout_marker << " "
+         << " Hz: " << 1 / delta_checkout_marker << endl;
 
-  int64_t ticks_compute_pose = cv::getTickCount();
+    ticks_compute_pose = cv::getTickCount();
+  }
 
   if (fractal_detected) {
     ROS_INFO("Detected fractal marker!");
@@ -258,11 +270,13 @@ void image_callback(const ImageConstPtr &image_msg) {
         // MarkerPoseArrayPub.publish(pose_array);
       }
     } // end of pose estimation
-    double delta_compute_pose =
-        (double)(cv::getTickCount() - ticks_compute_pose) /
-        cv::getTickFrequency();
-    cout << "computing marker pose: " << delta_compute_pose << " "
-         << " Hz: " << 1 / delta_compute_pose << endl;
+    if (fps_verbose) {
+      double delta_compute_pose =
+          (double)(cv::getTickCount() - ticks_compute_pose) /
+          cv::getTickFrequency();
+      cout << "computing marker pose: " << delta_compute_pose << " "
+           << " Hz: " << 1 / delta_compute_pose << endl;
+    }
 
     // Draw marker poses
     if (show_detections) {
@@ -342,6 +356,13 @@ void image_callback(const ImageConstPtr &image_msg) {
       }
     }
   }
+  if (fps_verbose) {
+    double delta_image_callback =
+        (double)(cv::getTickCount() - ticks_image_callback) /
+        cv::getTickFrequency();
+    cout << "checking image_callback: " << delta_image_callback << " "
+         << " Hz: " << 1 / delta_image_callback << endl;
+  }
 } // end of image_callback
 
 int main(int argc, char **argv) {
@@ -368,13 +389,13 @@ int main(int argc, char **argv) {
   nh.param("image_width", image_width, 752);
   nh.param("image_height", image_height, 480);
   nh.param("marker_name", marker_name, string("FRACTAL_4L_6"));
+  nh.param("fps_verbose", fps_verbose, true);
   int queue_size = 10;
 
   ros::Subscriber rgb_sub =
       nh.subscribe(rgb_topic.c_str(), queue_size, image_callback);
   ros::Subscriber c =
       nh.subscribe(rgb_info_topic.c_str(), queue_size, camera_info_callback);
-
 
   // Configure fractal marker detector
   FDetector.setConfiguration(marker_name);
@@ -388,7 +409,8 @@ int main(int argc, char **argv) {
   }
   // 0407 update distance info
   MarkerPosePub = nh.advertise<marker_msgs::PoseStamped>("marker_pose", 1);
-  RpyDegreePub = nh.advertise<marker_msgs::DegreeStamped>("marker_rpy_degree", 1);
+  RpyDegreePub =
+      nh.advertise<marker_msgs::DegreeStamped>("marker_rpy_degree", 1);
   // MarkerPoseArrayPub =
   //     nh.advertise<geometry_msgs::PoseArray>("marker_pose_array", 1);
 

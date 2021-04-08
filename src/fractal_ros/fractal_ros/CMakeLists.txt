@@ -5,6 +5,7 @@ set(OpenCV_DIR "/home/he/libs/opencv-3.4.5/build/installed/share/OpenCV")
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
+set(CMAKE_CXX_FLAGS "-O3")
 
 find_package(OpenCV REQUIRED)
 
