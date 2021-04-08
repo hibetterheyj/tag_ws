@@ -1,9 +1,8 @@
 <launch>
   <!-- ARG -->
-  <arg name="use_rviz" default="False" />
   <arg name="input_debug" default="False" />
   <arg name="output_debug" default="True" />
-  <arg name="use_rosbag" default="False" />
+  <arg name="use_rosbag" default="True" />
   <arg name="base_path" default="$(find fractal_ros)/bags/" />
   <arg name="bag_name" default="fractal4_2021-03-26-10-00-56" />
 
