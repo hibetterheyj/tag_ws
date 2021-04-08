@@ -5,7 +5,7 @@
   <arg name="use_rosbag" default="True" />
   <!--ln -s /home/he/Desktop/TagDection/tag_ws/bags/webcam/fractal-->
   <arg name="base_path" default="$(find fractal_ros)/bags/fractal/" />
-  <arg name="bag_name" default="2021-04-08-fractal_cvcam_left_up" />
+  <arg name="bag_name" default="2021-04-08-fractal_cvcam_right_down" />
 
   <arg name="image_width" default="640" /> 
   <arg name="image_height" default="480" />
@@ -41,7 +41,7 @@
 
   <group if="$(arg show_detections)">
     <group if="$(arg input_debug)">
-      <node pkg="rqt_image_view" type="rqt_image_view" name="origin_img" args="/cv_camera/image_raw" />
+      <node pkg="rqt_image_view" type="rqt_image_view" name="origin_img" args="/cv_camera/image_rect" />
     </group>
     <group if="$(arg output_debug)">
       <node pkg="rqt_image_view" type="rqt_image_view" name="result_img" args="/result_img" />

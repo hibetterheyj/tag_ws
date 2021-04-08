@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(fractal_msg)
+project(marker_msgs)
 
 find_package(catkin REQUIRED COMPONENTS
   message_generation
@@ -7,9 +7,6 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs)
 
 add_message_files(FILES
-  #Marker.msg
-  #MarkerArray.msg
-  FractalInfo.msg
   RPY.msg
   PoseStamped.msg
   DistStamped.msg

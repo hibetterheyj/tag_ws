@@ -1,3 +1,3 @@
 Header header
 geometry_msgs/Point xyz
-fractal_msg/RPY rpy
+marker_msgs/RPY rpy

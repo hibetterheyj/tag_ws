@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>fractal_msg</name>
+  <name>marker_msgs</name>
   <version>0.0.1</version>
-  <description>The fractal_msg package</description>
+  <description>The marker_msgs package</description>
   <maintainer email="he-yujie@outlook.com">Yujie He</maintainer>
   <url type="website">http://yujie-he.github.io/</url>
   <author email="yujie.he@epfl.ch">Yujie He</author>

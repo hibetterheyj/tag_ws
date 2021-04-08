@@ -12,8 +12,8 @@
 #include "sensor_msgs/Image.h"
 #include "std_msgs/Empty.h"
 #include "std_msgs/Int16.h"
-#include <fractal_msg/DistStamped.h>
-#include <fractal_msg/PoseStamped.h>
+#include <marker_msgs/DistStamped.h>
+#include <marker_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseArray.h>
 
 // ROS image geometry
@@ -43,7 +43,6 @@
 #include "aruco_fractal/aruco_cvversioning.h"
 #include "aruco_fractal/cvdrawingutils.h"
 #include "aruco_fractal/fractaldetector.h"
-#include <fractal_msg/FractalInfo.h>
 
 using namespace std;
 using namespace sensor_msgs;
@@ -274,8 +273,8 @@ void callback(const ImageConstPtr &image_msg) {
       std::cout << "Distance to fractal marker: " << dist << " meters. "
                 << std::endl;
       // 0407 update distance info
-      fractal_msg::DistStamped dist_stamped;
-      fractal_msg::PoseStamped pose_stamped;
+      marker_msgs::DistStamped dist_stamped;
+      marker_msgs::PoseStamped pose_stamped;
       dist_stamped.header.stamp = ros::Time::now();
       pose_stamped.header.stamp = ros::Time::now();
       dist_stamped.dist = dist;
@@ -424,8 +423,8 @@ int main(int argc, char **argv) {
   image_transport::ImageTransport it(nh);
   result_img_pub_ = it.advertise("/result_img", 1);
   // 0407 update distance info
-  MarkerDistPub = nh.advertise<fractal_msg::DistStamped>("marker_dist", 1);
-  MarkerPosePub = nh.advertise<fractal_msg::PoseStamped>("marker_pose", 1);
+  MarkerDistPub = nh.advertise<marker_msgs::DistStamped>("marker_dist", 1);
+  MarkerPosePub = nh.advertise<marker_msgs::PoseStamped>("marker_pose", 1);
   MarkerPoseArrayPub =
       nh.advertise<geometry_msgs::PoseArray>("marker_pose_array", 1);
 

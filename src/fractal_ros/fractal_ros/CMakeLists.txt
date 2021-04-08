@@ -20,7 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
         tf2_ros
         image_transport
         aruco_fractal
-        fractal_msg
+        marker_msgs
 )
 
 
@@ -38,7 +38,7 @@ catkin_package(
         tf2_ros
         image_transport
         aruco_fractal
-        fractal_msg
+        marker_msgs
 )
 
 ###########

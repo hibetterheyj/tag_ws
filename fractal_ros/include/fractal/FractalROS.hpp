@@ -43,7 +43,6 @@
 #include "aruco_fractal/aruco_cvversioning.h"
 #include "aruco_fractal/cvdrawingutils.h"
 #include "aruco_fractal/fractaldetector.h"
-#include <fractal_msg/FractalInfo.h>
 
 using namespace std;
 using namespace sensor_msgs;
@@ -117,7 +116,6 @@ private:
 
   //! ROS publisher
   image_transport::Publisher resultImgPublisher_;
-  ros::Publisher fractalInfoPublisher_;
   ros::Publisher posePublisher_;
 
   //! ROS topic subscriber.

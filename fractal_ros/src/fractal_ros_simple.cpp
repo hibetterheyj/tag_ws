@@ -39,7 +39,6 @@
 #include "aruco_fractal/aruco_cvversioning.h"
 #include "aruco_fractal/cvdrawingutils.h"
 #include "aruco_fractal/fractaldetector.h"
-#include <fractal_msg/FractalInfo.h>
 
 using namespace std;
 using namespace sensor_msgs;
