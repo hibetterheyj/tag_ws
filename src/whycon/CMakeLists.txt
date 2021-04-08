@@ -32,6 +32,7 @@ if(NOT DISABLE_ROS)
     tf
     nodelet
     std_srvs
+    marker_msgs
   )
 
   add_message_files(
@@ -46,7 +47,7 @@ if(NOT DISABLE_ROS)
   catkin_package(
     INCLUDE_DIRS include
     LIBRARIES whycon
-    CATKIN_DEPENDS cv_bridge roscpp sensor_msgs std_msgs message_runtime geometry_msgs
+    CATKIN_DEPENDS cv_bridge roscpp sensor_msgs std_msgs message_runtime geometry_msgs marker_msgs
   )
 endif()
 
@@ -74,7 +75,7 @@ if(NOT DISABLE_ROS)
 
   add_executable(set_axis src/ros/set_axis_node.cpp src/ros/set_axis.cpp)
   #add_executable(triangulator src/ros/triangulator_node.cpp src/ros/triangulator.cpp)
-  add_executable(robot_pose_publisher src/ros/robot_pose_publisher.cpp src/ros/robot_pose_publisher_node.cpp)  
+  add_executable(robot_pose_publisher src/ros/robot_pose_publisher.cpp src/ros/robot_pose_publisher_node.cpp)
   add_executable(transformer src/ros/transformer.cpp src/ros/transformer_node.cpp)
 
   add_dependencies(whycon-node whycon_generate_messages_cpp)

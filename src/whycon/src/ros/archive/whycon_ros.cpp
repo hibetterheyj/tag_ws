@@ -38,13 +38,11 @@ whycon::WhyConROS::WhyConROS(ros::NodeHandle& n) : is_tracking(false), should_re
   int input_queue_size = 1;
   n.param("input_queue_size", input_queue_size, input_queue_size);
   cam_sub = it.subscribeCamera("/camera/image_rect_color", input_queue_size, boost::bind(&WhyConROS::on_image, this, _1, _2));
-
+  
   image_pub = n.advertise<sensor_msgs::Image>("image_out", 1);
   poses_pub = n.advertise<geometry_msgs::PoseArray>("poses", 1);
   context_pub = n.advertise<sensor_msgs::Image>("context", 1);
-  projection_pub = n.advertise<whycon::Projection>("projection", 1);
-  // yujie added
-  rpy_degree_pub = n.advertise<marker_msgs::DegreeStamped>("marker_rpy_degree", 1);
+	projection_pub = n.advertise<whycon::Projection>("projection", 1);
 
   reset_service = n.advertiseService("reset", &WhyConROS::reset, this);
 }
@@ -94,18 +92,16 @@ void whycon::WhyConROS::publish_results(const std_msgs::Header& header, const cv
 {
   bool publish_images = (image_pub.getNumSubscribers() != 0);
   bool publish_poses = (poses_pub.getNumSubscribers() != 0);
-
+  
   if (!publish_images && !publish_poses) return;
-
+  
   // prepare image outpu
   cv::Mat output_image;
   if (publish_images)
     output_image = cv_ptr->image.clone();
 
   geometry_msgs::PoseArray pose_array;
-  // yujie added
-  marker_msgs::DegreeStamped degree_stamped;
-
+  
   // go through detected targets
   for (int i = 0; i < system->targets; i++) {
     const whycon::CircleDetector::Circle& circle = system->get_circle(i);
@@ -130,12 +126,6 @@ void whycon::WhyConROS::publish_results(const std_msgs::Header& header, const cv
       p.position.z = pose.pos(2);
       p.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, pose.rot(0), pose.rot(1));
       pose_array.poses.push_back(p);
-
-      // yujie added
-      degree_stamped.header.stamp = ros::Time::now();
-      degree_stamped.rpy.roll_d = 0.; // unable to extract
-      degree_stamped.rpy.pitch_d = pose.rot(0) * 180 / M_PI;
-      degree_stamped.rpy.yaw_d = pose.rot(1) * 180 / M_PI;
     }
   }
 
@@ -149,8 +139,6 @@ void whycon::WhyConROS::publish_results(const std_msgs::Header& header, const cv
     pose_array.header = header;
     pose_array.header.frame_id = frame_id;
     poses_pub.publish(pose_array);
-    // yujie added
-    rpy_degree_pub.publish(degree_stamped);
   }
 
   if (transformation_loaded)
@@ -161,7 +149,7 @@ void whycon::WhyConROS::publish_results(const std_msgs::Header& header, const cv
 	projection_msg.header = header;
 	for (size_t i = 0; i < projection.size(); i++) projection_msg.projection[i] = projection[i];
 	projection_pub.publish(projection_msg);
-  }
+  } 
 }
 
 void whycon::WhyConROS::load_transforms(void)

@@ -47,6 +47,9 @@
   <run_depend>image_transport</run_depend>
   <run_depend>message_filters</run_depend>
 
+  <build_depend>marker_msgs</build_depend>
+  <run_depend>marker_msgs</run_depend>
+
  <export>
     <nodelet plugin="${prefix}/nodelets.xml"/>
   </export>

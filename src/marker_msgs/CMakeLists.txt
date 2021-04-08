@@ -9,6 +9,9 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(FILES
   RPY.msg
   PoseStamped.msg
+  RpyDegree.msg
+  PoseDegreeStamped.msg
+  DegreeStamped.msg
   DistStamped.msg
 )
 generate_messages(DEPENDENCIES std_msgs geometry_msgs )
