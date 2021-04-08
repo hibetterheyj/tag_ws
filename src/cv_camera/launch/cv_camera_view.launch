@@ -2,7 +2,7 @@
   <!--REFERENCE-->
   <!-- https://wiki.ros.org/cv_camera -->
   <!-- ARGS-->
-  <arg name="device_id" default="0" />
+  <arg name="device_id" default="2" />
   <!-- default_camera_info_url = "file://${ROS_HOME}/camera_info/${NAME}.yaml"-->
   <arg name="calib_file_path" default="file://$(find cv_camera)/config/trust_webcam/camera.yaml" />
 
@@ -15,9 +15,10 @@
     <param name="camera_info_url" value="$(arg calib_file_path)" />
   </node>
 
-  <!-- image_raw -->
-  <node name="image_view_raw" pkg="image_view" type="image_view" respawn="false" output="screen">
+  <!-- image_view -->
+  <!-- <node name="image_view_raw" pkg="image_view" type="image_view" respawn="false" output="screen">
     <remap from="image" to="/cv_camera/image_raw" />
     <param name="autosize" value="true" />
-  </node>
+  </node> -->
+  <node pkg="rqt_image_view" type="rqt_image_view" name="cvcam_img" args="/cv_camera/image_raw" />
 </launch>

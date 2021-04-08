@@ -19,7 +19,7 @@
   <!-- FRACTAL_4L_6 not that robust-->
   <arg name="marker_name" default="FRACTAL_3L_6" />
   <arg name="blur_window_size" default="7" />
-  <arg name="lr" default="left"/>
+  <!-- <arg name="lr" default="left"/> -->
 
   <!-- NODE -->
   <group if="$(arg use_rosbag)">

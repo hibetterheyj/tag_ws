@@ -47,7 +47,7 @@
   - calibrate
 
     ```shell
-    roslaunch cv_camera cv_camera_only.launch
+    roslaunch cv_camera cv_camera_only.launch use_rect:=False
     # START A NEW TEMINNAL
     rosrun camera_calibration cameracalibrator.py --size 9x7 --square 0.020 image:=/cv_camera/image_raw camera:=/cv_camera
     ```

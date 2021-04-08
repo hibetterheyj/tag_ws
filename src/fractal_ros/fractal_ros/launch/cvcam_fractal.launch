@@ -1,6 +1,6 @@
 <launch>
   <!-- ARG -->
-  <arg name="input_debug" default="True" />
+  <arg name="input_debug" default="False" />
   <arg name="output_debug" default="True" />
   <!-- <arg name="use_rosbag" default="False" />
   <arg name="base_path" default="$(find aruco_yujie)/bags/" />
@@ -8,17 +8,23 @@
 
   <arg name="image_width" default="640" /> 
   <arg name="image_height" default="480" />
-  <arg name="camera" default="/cv_camera/image_raw" />
+  <arg name="camera" default="/cv_camera/image_rect" />
   <arg name="camera_info" default="/cv_camera/camera_info" />
   <arg name="tf_prefix" default="marker_id" />
   <arg name="show_detections" default="true" />
   <arg name="show_axis" default="true" /> <!-- must be true -->
   <arg name="show_cube" default="false" />
-  <arg name="marker_size" default="0.2" doc="length of the physical marker's side in meters" />
+  <!-- 0.277 | 0.404 -->
+  <arg name="marker_size" default="0.404" doc="length of the physical marker's side in meters" />
   <!-- FRACTAL_5L_6 | FRACTAL_4L_6 | FRACTAL_3L_6 | FRACTAL_2L_6 -->
   <arg name="marker_name" default="FRACTAL_4L_6" />
   <arg name="blur_window_size" default="7" />
-  <arg name="lr" default="left"/>
+  <!-- <arg name="lr" default="left"/> -->
+
+  <!--INCLUDE-->
+  <include file="$(find cv_camera)/launch/cv_camera_only.launch">
+    <arg name="device_id" value="2" />
+  </include>
 
   <!-- NODE -->
   <!-- <group if="$(arg use_rosbag)">
@@ -40,7 +46,7 @@
 
   <group if="$(arg show_detections)">
     <group if="$(arg input_debug)">
-      <node pkg="rqt_image_view" type="rqt_image_view" name="origin_img" args="/cv_camera/image_raw" />
+      <node pkg="rqt_image_view" type="rqt_image_view" name="origin_img" args="/cv_camera/image_rect" />
     </group>
     <group if="$(arg output_debug)">
       <node pkg="rqt_image_view" type="rqt_image_view" name="result_img" args="/result_img" />

@@ -2,7 +2,7 @@
   <!--REFERENCE-->
   <!-- https://wiki.ros.org/cv_camera -->
   <!-- ARGS-->
-  <arg name="device_id" default="0" />
+  <arg name="device_id" default="2" />
   <!-- default_camera_info_url = "file://${ROS_HOME}/camera_info/${NAME}.yaml"-->
   <arg name="calib_file_path" default="file://$(find cv_camera)/config/trust_webcam/camera.yaml" />
   <arg name="node_start_delay" default="1.0" />
