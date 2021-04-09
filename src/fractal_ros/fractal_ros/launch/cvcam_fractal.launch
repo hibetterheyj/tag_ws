@@ -11,11 +11,11 @@
   <arg name="camera" default="/cv_camera/image_rect" />
   <arg name="camera_info" default="/cv_camera/camera_info" />
   <arg name="tf_prefix" default="marker_id" />
-  <arg name="show_detections" default="false" />
-  <arg name="show_axis" default="false" /> <!-- must be true -->
+  <arg name="show_detections" default="true" />
+  <arg name="show_axis" default="true" />
   <arg name="show_cube" default="false" />
   <!-- 0.277 | 0.404 -->
-  <arg name="marker_size" default="0.404" doc="length of the physical marker's side in meters" />
+  <arg name="marker_size" default="0.277" doc="length of the physical marker's side in meters" />
   <!-- FRACTAL_5L_6 | FRACTAL_4L_6 | FRACTAL_3L_6 | FRACTAL_2L_6 -->
   <arg name="level" default="3" />
   <arg name="marker_name" default="FRACTAL_$(arg level)L_6" />

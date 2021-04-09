@@ -1,12 +1,13 @@
+#include "whycon_ros.h"
 #include <camera_info_manager/camera_info_manager.h>
 #include <fstream>
-#include <sensor_msgs/CameraInfo.h>
-#include <tf/tf.h>
-#include <sstream>
 #include <geometry_msgs/PoseArray.h>
-#include <yaml-cpp/yaml.h>
+#include <iomanip> // std::setprecision
+#include <sensor_msgs/CameraInfo.h>
+#include <sstream>
+#include <tf/tf.h>
 #include <whycon/Projection.h>
-#include "whycon_ros.h"
+#include <yaml-cpp/yaml.h>
 
 whycon::WhyConROS::WhyConROS(ros::NodeHandle& n) : is_tracking(false), should_reset(true), it(n)
 {
@@ -66,11 +67,12 @@ void whycon::WhyConROS::on_image(const sensor_msgs::ImageConstPtr& image_msg, co
   is_tracking = system->localize(image, should_reset/*!is_tracking*/, max_attempts, max_refine);
 
     double delta = (double)(cv::getTickCount() - ticks) / cv::getTickFrequency();
-    std::cout << "checking circle and compute distance: " << delta << " " << " fps: " << 1/delta << std::endl;
+    std::cout << "checking circle & distance: " << std::setprecision(5) << delta
+              << " " << " Hz: " << 1 / delta << std::endl;
 
-  if (is_tracking) {
-    publish_results(image_msg->header, cv_ptr);
-    should_reset = false;
+    if (is_tracking) {
+      publish_results(image_msg->header, cv_ptr);
+      should_reset = false;
   }
   else if (image_pub.getNumSubscribers() != 0)
     image_pub.publish(cv_ptr);
@@ -132,10 +134,15 @@ void whycon::WhyConROS::publish_results(const std_msgs::Header& header, const cv
       pose_array.poses.push_back(p);
 
       // yujie added
+      double roll, pitch, yaw;
+      tf::Quaternion q;
+      tf::quaternionMsgToTF(p.orientation, q);
+      tf::Matrix3x3(q).getRPY(roll, pitch, yaw);
       degree_stamped.header.stamp = ros::Time::now();
-      degree_stamped.rpy.roll_d = 0.; // unable to extract
-      degree_stamped.rpy.pitch_d = pose.rot(0) * 180 / M_PI;
-      degree_stamped.rpy.yaw_d = pose.rot(1) * 180 / M_PI;
+      degree_stamped.rpy.roll_d = pose.rot(0) * 180 / M_PI;
+      degree_stamped.rpy.pitch_d = pose.rot(1) * 180 / M_PI;
+      // Yaw, vertical to image axis (Z), unable to extract
+      degree_stamped.rpy.yaw_d =0.;
     }
   }
 

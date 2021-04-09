@@ -14,9 +14,9 @@
 #include "std_msgs/Int16.h"
 #include <geometry_msgs/PoseArray.h>
 #include <marker_msgs/DegreeStamped.h>
-#include <marker_msgs/DistStamped.h>
+//#include <marker_msgs/DistStamped.h>
 #include <marker_msgs/PoseStamped.h>
-#include <marker_msgs/RpyDegree.h>
+//#include <marker_msgs/RpyDegree.h>
 
 // ROS transform
 #include <tf/tf.h>
@@ -230,7 +230,7 @@ void image_callback(const ImageConstPtr &image_msg) {
       cv::Mat rot;
       cv::Rodrigues(rvec, rot);
       cv::Vec3d rpy = rot2euler(rot);
-      rpy[2] = -_angle_to_pipi(rpy[2] - M_PI / 2);
+      // rpy[2] = -_angle_to_pipi(rpy[2] - M_PI / 2);
       double dist =
           sqrt(pow(tvec.at<double>(0, 0), 2) + pow(tvec.at<double>(1, 0), 2) +
                pow(tvec.at<double>(2, 0), 2));
@@ -252,8 +252,12 @@ void image_callback(const ImageConstPtr &image_msg) {
         pose_stamped.rpy.roll = rpy[0];
         pose_stamped.rpy.pitch = rpy[1];
         pose_stamped.rpy.yaw = rpy[2];
+        // Roll,
         degree_stamped.rpy.roll_d = rpy[0] * 180 / M_PI;
+        // Pitch, corresponds to yaw in aerial pose. left (negative) -> right (positive)
         degree_stamped.rpy.pitch_d = rpy[1] * 180 / M_PI;
+        // Yaw, vertical to image axis (Z), stable is 0
+        // degree_stamped.rpy.yaw_d = 90.0 - rpy[2] * 180 / M_PI;
         degree_stamped.rpy.yaw_d = rpy[2] * 180 / M_PI;
         // MarkerDistPub.publish(dist_stamped);
         MarkerPosePub.publish(pose_stamped);

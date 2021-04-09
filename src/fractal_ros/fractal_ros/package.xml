@@ -2,7 +2,7 @@
 <package format="2">
     <name>fractal_ros</name>
     <version>0.0.1</version>
-    <description>The fractal_ros package.</description>
+    <description>Implementats the Fractal Marker system into ROS.</description>
 
     <maintainer email="he-yujie@outlook.com">Yujie He</maintainer>
     <url type="website">http://yujie-he.github.io/</url>

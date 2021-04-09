@@ -17,6 +17,16 @@
 >
 > https://visp-doc.inria.fr/doxygen/visp-daily/tutorial-bebop2-vs.html
 
+- bebop_autonomy: https://github.com/lagadic/bebop_autonomy
+
+- BebopS: https://github.com/gsilano/BebopS
+
+- Parrot-Sphinx: https://developer.parrot.com/docs/sphinx/whatissphinx.html
+
+  compellable with BebopS
+
+- code: https://github.com/lagadic/visp/tree/master/example/servo-bebop2
+
 #### [TODO] The Urban Last Mile Problem: Autonomous Drone Delivery to Your Balcony
 
 > [code](https://github.com/szebedy/autonomous-drone)
@@ -92,7 +102,13 @@
 - **UZH**
   - The high-level controller receives as input the reference position, velocity, acceleration and yaw, and produces the desired collective thrust and body rates. These are sent to the low-level controller, which is responsible for body rate control (i.e., transforms the reference body rates into desired torques) and computes the single-rotor thrusts necessary to achieve the reference collective thrust and torques.
 
+---
+
 ### camera pose output
+
+> :construction: **pose representation !!!**
+
+- ZYX: ψ为Yaw偏航角，θ为Roll俯仰角，φ为Pitch滚转角
 
 - xyz: camera_relative to marker
 
@@ -132,8 +148,48 @@
 
     :construction: degrees are not very stable
 
+- new version of whycon: https://github.com/jiriUlr/whycon-ros
+
+  ```
+  float angle;                // axis angle around marker's surface normal
+  ```
+
 - aruco marker
 - apriltag
 
 ---
 
+### convert eular angles from qua
+
+- tf: https://docs.ros.org/en/diamondback/api/tf/html/c++/namespacetf.html
+
+  ```c++
+  static geometry_msgs::Quaternion tf::createQuaternionMsgFromRollPitchYaw(roll, pitch, yaw)
+  ```
+
+- [**Quaternion to Euler angle convention in TF**](https://answers.ros.org/question/239689/quaternion-to-euler-angle-convention-in-tf/)
+
+  ```c++
+  //Let q be the quaternion of the current odom transform
+  tfScalar yaw, pitch, roll;
+  tf::Matrix3x3 mat(q);
+  mat.getEulerYPR(&yaw, &pitch, &roll);
+  ```
+
+- https://github.com/szebedy/autonomous-drone/blob/master/src/offboard_control/drone_control.cpp
+
+  ```c++
+  double DroneControl::getYaw(const geometry_msgs::Quaternion &msg)
+  {
+    //Calculate yaw current orientation
+    double roll, pitch, yaw;
+    tf::Quaternion q;
+  
+    tf::quaternionMsgToTF(msg, q);
+    tf::Matrix3x3(q).getRPY(roll, pitch, yaw);
+  
+    return yaw;
+  }
+  ```
+
+  
