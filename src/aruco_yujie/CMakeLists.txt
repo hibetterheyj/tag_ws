@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
         tf2_ros
         image_transport
         message_generation
+        marker_msgs
 )
 
 ## add info related to msg
@@ -43,6 +44,7 @@ catkin_package(
         tf2_ros
         image_transport
         message_runtime
+        marker_msgs
 )
 
 ###########

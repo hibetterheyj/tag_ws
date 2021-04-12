@@ -3,6 +3,8 @@
 #include <map> // used for hashmap to give certainty
 #include <vector> // used in hashmap
 #include <numeric> // used for summing a vector
+// pow
+#include <cmath>
 
 // ROS
 #include "ros/ros.h"
@@ -12,6 +14,9 @@
 #include "sensor_msgs/CameraInfo.h"
 #include "std_msgs/Empty.h"
 #include "std_msgs/Int16.h"
+// yujie marker_msgs
+#include <marker_msgs/DegreeStamped.h>
+#include <marker_msgs/PoseStamped.h>
 
 // ROS image geometry
 #include <image_geometry/pinhole_camera_model.h>
@@ -44,7 +49,9 @@ using namespace cv;
 image_transport::Publisher result_img_pub_;
 ros::Publisher tf_list_pub_;
 ros::Publisher aruco_info_pub_;
-
+// yujie marker_msgs
+ros::Publisher MarkerPosePub;
+ros::Publisher RpyDegreePub;
 
 #define SSTR(x) static_cast<std::ostringstream&>(std::ostringstream() << std::dec << x).str()
 #define ROUND2(x) std::round(x * 100) / 100
@@ -112,6 +119,22 @@ tf2::Transform create_transform(const Vec3d &tvec, const Vec3d &rotation_vector)
     transform.setOrigin(cv_vector3d_to_tf_vector3(tvec));
     transform.setRotation(cv_vector3d_to_tf_quaternion(rotation_vector));
     return transform;
+}
+
+cv::Vec3d rot2euler(cv::Mat &rot) {
+  double sy = sqrt(rot.at<double>(0, 0) * rot.at<double>(0, 0) +
+                   rot.at<double>(1, 0) * rot.at<double>(1, 0));
+  double x, y, z;
+  if (sy >= 1e-6) {
+    x = atan2(rot.at<double>(2, 1), rot.at<double>(2, 2));
+    y = atan2(-rot.at<double>(2, 0), sy);
+    z = atan2(rot.at<double>(1, 0), rot.at<double>(0, 0));
+  } else {
+    x = atan2(-rot.at<double>(1, 2), rot.at<double>(1, 1));
+    y = atan2(-rot.at<double>(2, 0), sy);
+    z = 0;
+  }
+  return cv::Vec3d(x, y, z);
 }
 
 void callback_camera_info(const CameraInfoConstPtr &msg) {
@@ -206,8 +229,41 @@ void callback(const ImageConstPtr &image_msg) {
         aruco::estimatePoseSingleMarkers(corners, marker_size, intrinsic_matrix, distortion_coefficients,
                                         rotation_vectors, translation_vectors);
         for (auto i = 0; i < rotation_vectors.size(); ++i) {
-            aruco::drawAxis(image, intrinsic_matrix, distortion_coefficients,
-                            rotation_vectors[i], translation_vectors[i], marker_size * 0.5f);
+          aruco::drawAxis(image, intrinsic_matrix, distortion_coefficients,
+                          rotation_vectors[i], translation_vectors[i],
+                          marker_size * 0.5f);
+          // yujie marker_msgs
+          marker_msgs::PoseStamped pose_stamped;
+          marker_msgs::DegreeStamped degree_stamped;
+          // dist_stamped.header.stamp = ros::Time::now();
+          pose_stamped.header.stamp = ros::Time::now();
+          degree_stamped.header.stamp = pose_stamped.header.stamp;
+          // dist_stamped.dist = dist;
+          pose_stamped.xyz.x = translation_vectors[i][0];
+          pose_stamped.xyz.y = translation_vectors[i][1];
+          pose_stamped.xyz.z = translation_vectors[i][2];
+          double dist = sqrt(pow(pose_stamped.xyz.x, 2) +
+                             pow(pose_stamped.xyz.y, 2) +
+                             pow(pose_stamped.xyz.z, 2));
+          std::cout << "Distance to fractal marker: " << dist << " meters. "
+                    << std::endl;
+          cv::Mat rot;
+          cv::Rodrigues(rotation_vectors[i], rot);
+          cv::Vec3d rpy = rot2euler(rot);
+          pose_stamped.rpy.roll = rpy[0];
+          pose_stamped.rpy.pitch = rpy[1];
+          pose_stamped.rpy.yaw = rpy[2];
+          // Roll,
+          degree_stamped.rpy.roll_d = rpy[0] * 180 / M_PI;
+          // Pitch, corresponds to yaw in aerial pose. left (negative) -> right
+          // (positive)
+          degree_stamped.rpy.pitch_d = rpy[1] * 180 / M_PI;
+          // Yaw, vertical to image axis (Z), stable is 0
+          // degree_stamped.rpy.yaw_d = 90.0 - rpy[2] * 180 / M_PI;
+          degree_stamped.rpy.yaw_d = rpy[2] * 180 / M_PI;
+          // MarkerDistPub.publish(dist_stamped);
+          MarkerPosePub.publish(pose_stamped);
+          RpyDegreePub.publish(degree_stamped);
         }
 
         // Draw marker poses
@@ -415,6 +471,9 @@ int main(int argc, char **argv) {
   tf_list_pub_    = nh.advertise<tf2_msgs::TFMessage>("/tf_list", 10);
 
   aruco_info_pub_ = nh.advertise<aruco_yujie::ArucoInfo>("/aruco_list", 10);
+  // yujie marker_msgs
+  MarkerPosePub = nh.advertise<marker_msgs::PoseStamped>("marker_pose", 1);
+  RpyDegreePub = nh.advertise<marker_msgs::DegreeStamped>("marker_rpy_degree", 1);
 
   ros::spin();
   return 0;
