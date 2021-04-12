@@ -1,0 +1,37 @@
+<launch>
+  <!-- ARG -->
+  <arg name="name" default="whycon"/>
+  <arg name="targets" default="1"/>
+  <arg name="outer_diameter" default="0.170" />
+  <arg name="inner_diameter" default="0.080" />
+  <arg name="use_left" default="true" />
+  <arg name="use_right" default="false" />
+
+  <!-- INCLUDE -->
+  <include file="$(find mynt_eye_ros_wrapper)/launch/mynteye.launch" />
+
+  <!-- NODE -->
+  <group if="$(arg use_left)">
+    <node name="whycon_left" type="whycon" pkg="whycon" output="screen">
+      <param name="targets" value="$(arg targets)" />
+      <param name="name" value="$(arg name)" />
+      <!--<param name="outer_diameter" value="$(arg outer_diameter)" />
+      <param name="inner_diameter" value="$(arg inner_diameter)" />-->
+      <remap from="/camera/camera_info" to="/mynteye/left_rect/camera_info" />
+      <remap from="/camera/image_rect_color" to="/mynteye/left_rect/image_rect" />
+    </node>
+  </group>
+
+  <group if="$(arg use_right)">
+    <node name="whycon_right" type="whycon" pkg="whycon" output="screen">
+      <param name="targets" value="$(arg targets)"/>
+      <param name="name" value="$(arg name)"/>
+      <param name="outer_diameter" value="$(arg outer_diameter)" />
+      <param name="inner_diameter" value="$(arg inner_diameter)" />
+      <remap from="/camera/camera_info" to="/mynteye/right_rect/camera_info" />
+      <remap from="/camera/image_rect_color" to="/mynteye/right_rect/image_rect" />
+    </node>
+  </group>
+
+  <node name="transformer" type="transformer" pkg="whycon" output="screen"/>
+</launch>
