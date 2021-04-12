@@ -12,7 +12,8 @@
     <arg name="tf_prefix" default="marker_id" />
     <arg name="show_detections" default="false" />
     <arg name="marker_size" default="0.178" doc="length of the physical marker's side in meters" />
-    <arg name="dictionary_name" default="DICT_5X5_1000" />
+    <arg name="grid" default="5" />
+    <arg name="dictionary_name" default="DICT_$(arg grid)X$(arg grid)_1000" />
     <arg name="blur_window_size" default="7" />
     <arg name="num_detected" default="25" /> <!-- 0: do not use it, -->
     <arg name="min_prec_value" default="50" /> <!-- 0: do not use it, 80 means aruco marker must be detected in 80% of the last pics to be displayed -->
