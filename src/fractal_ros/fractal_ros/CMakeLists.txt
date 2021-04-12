@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 2.8)
 project(fractal_ros)
 # adding 3.4.5 as main OpenCV version to be compatible with MYNT
-#set(OpenCV_DIR "/home/he/libs/opencv-3.4.5/build/installed/share/OpenCV")
 set(OpenCV_DIR "/home/lis/opencv-3.4.5/build/installed/share/OpenCV")
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
+set(CMAKE_CXX_FLAGS "-O3")
 
 find_package(OpenCV REQUIRED)
 
@@ -21,7 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
         tf2_ros
         image_transport
         aruco_fractal
-        fractal_msg
+        marker_msgs
 )
 
 
@@ -39,7 +39,7 @@ catkin_package(
         tf2_ros
         image_transport
         aruco_fractal
-        fractal_msg
+        marker_msgs
 )
 
 ###########
@@ -51,6 +51,28 @@ include_directories(
         ${catkin_INCLUDE_DIRS}
         ${OpenCV_INCLUDE_DIRS}
 )
+
+###########
+# Library #
+###########
+
+# add_library(${PROJECT_NAME}_library
+#         src/FractalROS.cpp
+# }
+
+# target_link_libraries(${PROJECT_NAME}_library
+#         ${catkin_LIBRARIES}
+#         ${OpenCV_LIBRARIES}
+# )
+
+##############
+# Executable #
+##############
+
+# add_executable(${PROJECT_NAME}_ros_node src/fractal_node.cpp)
+# target_link_libraries(${PROJECT_NAME}_ros_node
+#         ${PROJECT_NAME}_library
+# )
 
 add_executable(${PROJECT_NAME}_node src/fractal_ros_simple.cpp)
 target_link_libraries(${PROJECT_NAME}_node

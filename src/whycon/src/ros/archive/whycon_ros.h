@@ -8,8 +8,6 @@
 #include <std_srvs/Empty.h>
 #include <tf/tf.h>
 #include <tf/transform_broadcaster.h>
-// yujie added
-#include <marker_msgs/DegreeStamped.h>
 
 namespace whycon {
   class WhyConROS {
@@ -22,7 +20,7 @@ namespace whycon {
     private:
 			void load_transforms(void);
       void publish_results(const std_msgs::Header& header, const cv_bridge::CvImageConstPtr& cv_ptr);
-
+      
 			whycon::DetectorParameters parameters;
       boost::shared_ptr<whycon::LocalizationSystem> system;
       bool is_tracking, should_reset;
@@ -39,8 +37,6 @@ namespace whycon {
       ros::ServiceServer reset_service;
 
       ros::Publisher image_pub, poses_pub, context_pub, projection_pub;
-      // yujie added
-      ros::Publisher rpy_degree_pub;
 			boost::shared_ptr<tf::TransformBroadcaster>	transform_broadcaster;
 
       image_geometry::PinholeCameraModel camera_model;
