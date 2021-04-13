@@ -11,17 +11,18 @@
 - [x] time analysis
   - [x] preliminary test (21.3.11)
   - [ ] using gprof mentioned in [Zhihu](https://www.zhihu.com/question/265131281)
-  - [ ] update all time performance on JestonNano (21.3.26)
+  - [x] update all time performance on JestonNano (11.4.26)
 - [ ] add badge using https://shields.io/
   clang, ros-melodic, opencv-3.2/3.4, aruco-3.1.12
   3.4.5
-- [ ] add resources
+- [x] add resources
   - [x] calibration and tag files (21.3.13)
   - [x] update preliminary rosbags (21.3.11)
   - [ ] update videos and camera parameter files in drone scenarios
 - [ ] add CI/CD
 - [ ] update OpenCV3.4.5 compilation procedure
 - [x] update MyntEye SDK repo for jestonNano: https://github.com/hibetterheyj/MYNT-EYE-S-SDK/tree/jeston (21.3.25)
+- [ ] add AprilTag: https://github.com/AprilRobotics/apriltag_ros
 
 ## Work with camera
 
@@ -151,11 +152,19 @@
   roslaunch aruco_yujie aruco_yujie_5_5_rosbag.launch
   ```
 
-### aruco_ros
+### apriltag_ros
 
-- pal-robotics/aruco_ros: <https://github.com/pal-robotics/aruco_ros>
+> <https://github.com/AprilRobotics/apriltag_ros>
+>
+> need catkin build
+
+
 
 ### others
+
+### aruco_ros (can work but archived!)
+
+- pal-robotics/aruco_ros: <https://github.com/pal-robotics/aruco_ros>
 
 #### official
 
